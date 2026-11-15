@@ -181,13 +181,13 @@ Sebagai pemenuhan luaran Tugas Team-Based Project (TBP), pipeline diuji dengan d
 
 ## 👥 Pembagian Peran & Tanggung Jawab Tim
 
-Proyek ini diselesaikan secara kolaboratif oleh tim mahasiswa Teknik Informatika Universitas Tadulako:
+Pembagian tugas dalam penyelesaian Praktik Pipeline CI (Tugas Team-Based Project):
 
-| Foto Profil | Data Anggota | Peran & Tanggung Jawab Utama |
+| Foto Profil | Data Anggota | Peran & Tanggung Jawab (Fokus Praktik CI) |
 | :---: | :--- | :--- |
-| <img src="foto/raehanhamdani.jpeg" width="80" style="border-radius:50%"> | **Raehan Hamdani**<br>*(Ketua Tim / DevOps & Backend)* | • Perancangan arsitektur pipeline CI/CD (`.github/workflows/ci.yml`).<br>• Pengembangan RESTful API backend menggunakan Express.js.<br>• Integrasi database relasional MySQL.<br>• Konfigurasi dependensi dan deployment workflow. |
-| <img src="foto/cutsafira1.jpeg" width="80" style="border-radius:50%"> | **Cut Safira**<br>*(Frontend Developer & UI/UX)* | • Perancangan antarmuka POS & ERP digital modern berbasis Tailwind CSS.<br>• Implementasi interaktivitas UI transaksi kasir dan layout responsif.<br>• Integrasi aset visual dan styling antarmuka pengguna. |
-| <img src="foto/fiviandwiintan.jpeg" width="80" style="border-radius:50%"> | **Fivian Dwi Intan**<br>*(QA & Technical Writer)* | • Pembuatan skenario automated unit testing (`tendebarber_api/test/server.test.js`).<br>• Verifikasi integritas build dan eksekusi pengujian lokal.<br>• Penyusunan laporan teknis, tabel analisis error, dan dokumentasi README. |
+| <img src="foto/raehanhamdani.jpeg" width="80" style="border-radius:50%"> | **Raehan Hamdani**<br>*(Ketua Tim)* | • Membuat dan mengonfigurasi berkas workflow CI Pipeline (`.github/workflows/ci.yml`) untuk event push dan pull request.<br>• Menyiapkan perintah build dan automated test agar berjalan di lingkungan CI.<br>• Melakukan simulasi eksekusi kasus run gagal dan run sukses di GitHub Actions.<br>• Menyusun dokumentasi README untuk panduan menjalankan CI. |
+| <img src="foto/cutsafira1.jpeg" width="80" style="border-radius:50%"> | **Cut Safira**<br>*(Anggota Tim)* | • Menyusun laporan tugas Praktik Pipeline CI (Team-Based Project).<br>• Mengumpulkan dan mendokumentasikan bukti tangkapan layar (screenshot) hasil eksekusi run sukses dan gagal.<br>• Membantu penyusunan penjelasan alur kerja pipeline pada dokumen laporan. |
+| <img src="foto/fiviandwiintan.jpeg" width="80" style="border-radius:50%"> | **Fivian Dwi Intan**<br>*(Anggota Tim)* | • Menyusun laporan tugas Praktik Pipeline CI (Team-Based Project).<br>• Menyusun dokumentasi ringkasan error dan langkah-langkah perbaikan yang dilakukan.<br>• Memeriksa kelengkapan seluruh berkas luaran tugas sesuai kriteria penilaian. |
 
 ---
 
