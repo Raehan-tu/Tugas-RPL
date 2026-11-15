@@ -10,7 +10,7 @@ app.use(express.json());
 
 const db = mysql.createConnection({
     host: 'localhost',
-    user: 'root',      
+    user: 'root',
     password: 'Raehanhamdani@1',      // Pastikan sesuai dengan password database Anda sebelumnya
     database: 'tendebarber_db'
 });
@@ -64,10 +64,10 @@ app.get('/api/transactions', (req, res) => {
 // 5. Menyimpan Transaksi Baru (Dari Kasir)
 app.post('/api/transactions', (req, res) => {
     const { id, waktu_transaksi, kapster_id, service_id, diskon, total_bayar, komisi_kapster, metode_bayar } = req.body;
-    
+
     const query = `INSERT INTO transactions (id, waktu_transaksi, kapster_id, service_id, diskon, total_bayar, komisi_kapster, metode_bayar) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
     const values = [id, waktu_transaksi, kapster_id, service_id, diskon, total_bayar, komisi_kapster, metode_bayar];
-    
+
     db.query(query, values, (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ success: true, message: 'Transaksi tersimpan!' });
