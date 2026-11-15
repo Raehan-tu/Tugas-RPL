@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TENDEBARBER - Digital POS & ERP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- SEMBUNYIKAN KURSOR BAWAAN --- */
+        *, *::before, *::after {
+            cursor: none !important;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #ffffff;
+            color: #0f172a;
+            overflow-x: hidden;
+        }
+
+        /* --- KURSOR CUSTOM DOT & RING (Sesuai Referensi Gambar) --- */
+        #cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #0f172a; /* Titik hitam/gelap */
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 999999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease-out, background-color 0.3s ease;
+            will-change: left, top, transform;
+        }
+        #cursor-ring {
+            width: 36px;
+            height: 36px;
+            border: 2px solid rgba(15, 23, 42, 0.3); /* Lingkaran garis luar */
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 999998;
+            transform: translate(-50%, -50%);
+            /* Animasi mengikuti sedikit delay alami bawaan transisi ini */
+            transition: transform 0.15s ease-out, width 0.3s, height 0.3s, border-color 0.3s;
+            will-change: left, top, transform;
+        }
+        
+        /* Efek saat kursor hover di tombol/interaktif */
+        .hovering #cursor-dot {
+            transform: translate(-50%, -50%) scale(0.5);
+            background-color: #ef4444; /* Merah aksen barber */
+        }
+        .hovering #cursor-ring {
+            width: 50px;
+            height: 50px;
+            border-color: rgba(59, 130, 246, 0.4); /* Biru aksen barber */
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+
+        /* --- BACKGROUND DOT MATRIX --- */
+        .dot-matrix {
+            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+            background-size: 32px 32px;
+        }
+
+        /* --- ANIMASI BARBER POLE (Red, White, Blue) --- */
+        .barber-pole {
+            background: repeating-linear-gradient(
+                -45deg,
+                #ef4444, #ef4444 10px,
+                #ffffff 10px, #ffffff 20px,
+                #3b82f6, #3b82f6 30px,
+                #ffffff 30px, #ffffff 40px
+            );
+            background-size: 200% 200%;
+            animation: poleSlide 3s linear infinite;
+        }
+        @keyframes poleSlide {
+            0% { background-position: 0 0; }
+            100% { background-position: 100% 100%; }
+        }
+
+        /* --- AKSEN GARIS BARBERSHOP --- */
+        .barber-accent-border {
+            border-top: 4px solid transparent;
+            border-image: linear-gradient(to right, #ef4444, #ffffff, #3b82f6) 1;
+        }
+
+        /* --- TYPING EFFECT --- */
+        .cursor-type {
+            display: inline-block;
+            width: 3px;
+            background-color: #0f172a;
+            margin-left: 4px;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        /* --- 3D TILT ID CARD --- */
+        .id-card-wrapper {
+            perspective: 1500px;
+        }
+        .id-card-inner {
+            transform-style: preserve-3d;
+            /* Transisi SANGAT LAMBAT untuk kembalinya kartu agar tidak kaget */
+            transition: transform 1.5s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 1.5s ease;
+            will-change: transform;
+        }
+        /* Saat mouse bergerak di atasnya, transisi dipercepat agar cepat mengikuti */
+        .id-card-inner.tracking {
+            transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+        }
+        .id-card-inner.clicking {
+            transition: transform 0.1s ease-out !important;
+            transform: scale(0.95) !important;
+        }
+        .card-content-float { transform: translateZ(50px); }
+        .card-content-float-high { transform: translateZ(80px); }
+        
+        /* Animasi Gambar (Lambat pas ditinggal, Cepat pas dihover) */
+        .team-img {
+            opacity: 0.4;
+            filter: grayscale(100%);
+            transition: opacity 1.5s ease-out, filter 1.5s ease-out; /* Transisi lambat */
+        }
+        .id-card-inner:hover .team-img {
+            opacity: 1;
+            filter: grayscale(0%);
+            transition: opacity 0.3s ease-in, filter 0.3s ease-in; /* Transisi cepat */
+        }
+
+        /* --- UTILITIES & BUTTON EFFECTS --- */
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .view-section {
+            display: none; opacity: 0; transition: opacity 0.4s ease;
+        }
+        .view-section.active { display: flex; opacity: 1; }
+        
+        .btn-interactive { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .btn-interactive:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1), 0 10px 15px -6px rgba(0, 0, 0, 0.05);
+        }
+        .btn-interactive:active {
+            transform: translateY(1px) scale(0.97);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- SCROLL REVEAL ANIMATION (Global & Berulang setiap scroll) --- */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Input Custom hilangkan panah */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type="number"] { -moz-appearance: textfield; }
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="month"]::-webkit-calendar-picker-indicator {
+            background: transparent; bottom: 0; color: transparent; cursor: pointer;
+            height: auto; left: 0; position: absolute; right: 0; top: 0; width: auto;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen">
+
+    <!-- Custom Cursor Target -->
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
+
+    <!-- Garis Aksen Barbershop di Paling Atas Web -->
+    <div class="fixed top-0 left-0 w-full h-1.5 bg-gradient-to-r from-red-500 via-white to-blue-500 z-[100]"></div>
+
+    <!-- ==========================================
+         1. CONTAINER LANDING PAGE & LOGIN (SCROLLABLE)
+    =========================================== -->
+    <div id="wrapper-landing-login" class="view-section active flex-col w-full bg-white dot-matrix absolute inset-0 z-50 overflow-x-hidden">
+        
+        <!-- Navbar -->
+        <nav class="w-full flex items-center px-6 md:px-12 py-8 sticky top-0 bg-white/70 backdrop-blur-lg z-[60] transition-all">
+            <div class="flex items-center gap-3 cursor-default relative z-10">
+                <div class="w-2.5 h-8 barber-pole rounded-full shadow-sm border border-slate-200"></div>
+                <div class="font-black text-2xl tracking-tighter text-slate-900">
+                    TENDEBARBER
+                </div>
+            </div>
+            <!-- Tombol POS System sudah dihapus sesuai instruksi -->
+        </nav>
+
+        <!-- Hero Section (Tampilan Awal) -->
+        <div id="hero" class="container mx-auto px-6 md:px-12 flex flex-col lg:flex-row items-center justify-center min-h-[calc(100vh-100px)] gap-12 py-10 relative">
+            
+            <!-- Kiri: Teks -->
+            <div class="w-full lg:w-[55%] flex flex-col items-start text-left relative z-10">
+                <div class="text-[10px] font-black tracking-widest uppercase text-slate-400 mb-6 flex items-center gap-2 reveal-on-scroll">
+                    <i class="fas fa-chevron-right text-[10px] text-red-500"></i> INFORMATICS PROJECT
+                </div>
+                
+                <h1 class="text-7xl md:text-8xl lg:text-[6rem] font-black tracking-tighter leading-[0.9] mb-8 text-slate-900 reveal-on-scroll" style="transition-delay: 100ms;">
+                    TENDE<br>BARBER<span class="text-blue-600">.</span>
+                </h1>
+                
+                <div class="text-2xl md:text-3xl font-extrabold text-slate-800 mb-8 flex items-center flex-wrap h-10 reveal-on-scroll" style="transition-delay: 200ms;">
+                    <span class="mr-3">Dibuat oleh</span>
+                    <!-- Efek Ketikan -->
+                    <span class="bg-slate-900 text-white px-4 py-1.5 rounded-xl typed-text shadow-md"></span><span class="cursor-type"></span>
+                </div>
+                
+                <p class="text-slate-500 font-medium max-w-lg mb-16 text-lg leading-relaxed reveal-on-scroll" style="transition-delay: 300ms;">
+                    Sistem Point of Sale dan Enterprise Resource Planning yang dibangun oleh Mahasiswa <strong class="text-slate-900">Universitas Tadulako</strong>, Teknik Informatika Kelas A. Didesain untuk manajemen kasir, kapster, dan owner.
+                </p>
+                
+                <!-- Scroll Indicator -->
+                <div class="flex flex-col items-start reveal-on-scroll" style="transition-delay: 400ms;">
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Scroll untuk login</span>
+                    <div class="w-6 h-10 border-2 border-slate-300 rounded-full flex justify-center pt-1.5">
+                        <div class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kanan: 3D ID Card -->
+            <div class="w-full lg:w-[45%] flex justify-center items-center id-card-wrapper h-[600px] select-none z-10 relative reveal-on-scroll" style="transition-delay: 200ms;" id="card-container">
+                <!-- Aksen visual di belakang card -->
+                <div class="absolute w-80 h-80 bg-gradient-to-tr from-blue-100 to-red-50 rounded-full blur-3xl opacity-50 z-0 pointer-events-none"></div>
+
+                <div id="id-card" onclick="cycleTeamMember()" class="id-card-inner bg-white w-[340px] rounded-[2.5rem] border border-slate-200 p-6 flex flex-col relative shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] group z-10 cursor-pointer">
+                    
+                    <!-- Lanyard Hole -->
+                    <div class="w-full flex justify-center mb-6">
+                        <div class="w-20 h-5 bg-slate-50 rounded-full shadow-inner border border-slate-200 flex justify-center items-center">
+                            <div class="w-8 h-1 bg-slate-300 rounded-full"></div>
+                        </div>
+                    </div>
+
+                    <!-- Image Area -->
+                    <div class="card-content-float w-full h-[320px] bg-slate-100 rounded-[2rem] overflow-hidden relative mb-6 border border-slate-200 flex items-center justify-center shadow-inner group-hover:border-blue-200 transition-colors duration-300">
+                        <!-- Tulisan Fallback jika tidak ada foto -->
+                        <span id="team-placeholder" class="text-slate-400 font-black text-xl absolute z-0 hidden">No Image</span>
+                        
+                        <!-- Gambar (Diatur CSS team-img agar lambat balik, cepat hover) -->
+                        <img id="team-image" src="foto/raehanhamdani.jpeg" onerror="this.onerror=null; this.classList.add('hidden'); document.getElementById('team-placeholder').classList.remove('hidden');" alt="Team Member" class="team-img w-full h-full object-cover relative z-10">
+                        
+                        <!-- Badge ID -->
+                        <div class="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm text-slate-900 text-[10px] font-black px-3 py-1.5 rounded-lg shadow-sm z-20 border border-slate-100 flex items-center gap-1.5">
+                            <div class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
+                            <span id="team-badge" class="tracking-widest uppercase">Tadulako University</span>
+                        </div>
+                    </div>
+
+                    <!-- Info Area (Dihapus bagian UI/UX/Frontend) -->
+                    <div class="card-content-float-high flex justify-between items-end">
+                        <div class="flex flex-col w-full">
+                            <h2 id="team-name" class="text-2xl font-black text-slate-900 tracking-tight leading-none mb-4">Raehan Hamdani</h2>
+                            
+                            <div class="flex justify-between items-end w-full">
+                                <div class="flex flex-col gap-2">
+                                    <div class="flex flex-col">
+                                        <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Class</span>
+                                        <span class="text-xs font-bold text-slate-800 flex items-center"><i class="fas fa-university mr-1.5 text-slate-300"></i> <span id="team-class">Teknik Informatika A</span></span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Angkatan</span>
+                                        <span class="text-xs font-bold text-slate-800 flex items-center"><i class="fas fa-calendar-alt mr-1.5 text-slate-300"></i> <span id="team-angkatan">2025</span></span>
+                                    </div>
+                                </div>
+                                
+                                <!-- Refresh Button Icon -->
+                                <div class="w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center bg-slate-900 text-white group-hover:bg-blue-600 group-hover:border-blue-600 group-hover:rotate-180 transition-all duration-500 shadow-md shrink-0">
+                                    <i class="fas fa-sync-alt text-sm"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Scroll Divider -->
+        <div class="w-full py-32 flex justify-center opacity-30 relative z-10 pointer-events-none">
+            <div class="w-px h-40 bg-gradient-to-b from-slate-400 to-transparent"></div>
+        </div>
+
+        <!-- Login Section (Merespon scroll bolak-balik) -->
+        <div id="login" class="min-h-[80vh] w-full flex items-center justify-center p-6 relative pb-32">
+            
+            <!-- Wrapper Animasi Scroll (Dipisah agar transisi tidak bentrok) -->
+            <div class="w-full max-w-md mx-auto relative z-20 reveal-on-scroll">
+                <div class="bg-white p-10 md:p-12 rounded-[2.5rem] border border-slate-200 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] barber-accent-border hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)] transition-shadow">
+                    
+                    <div class="text-center mb-10">
+                        <div class="w-16 h-16 bg-slate-900 text-white rounded-[1.25rem] flex items-center justify-center mx-auto mb-5 text-2xl shadow-lg shadow-slate-900/20">
+                            <i class="fas fa-cash-register"></i>
+                        </div>
+                        <h2 class="text-3xl font-black text-slate-900 tracking-tight mb-1">Sistem POS</h2>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tende Barber ERP</p>
+                    </div>
+
+                    <form id="login-form" onsubmit="handleLogin(event)" class="space-y-6">
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Akses Akun</label>
+                            <div class="relative">
+                                <select id="login-email" required
+                                    class="w-full pl-5 pr-10 py-4 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-0 focus:border-blue-500 transition-colors font-bold text-slate-900 outline-none text-sm appearance-none cursor-pointer">
+                                    <option value="kasir">Kasir@demo.com</option>
+                                    <option value="admin">Admin@demo.com</option>
+                                </select>
+                                <div class="absolute inset-y-0 right-5 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-end mb-2">
+                                <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Kata Sandi</label>
+                                <div class="text-[9px] font-bold text-slate-400 text-right leading-tight">
+                                    Kasir: <span class="text-slate-600">kasir123</span><br>
+                                    Admin: <span class="text-slate-600">admin123</span>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <input type="password" id="login-password" required
+                                    class="w-full pl-5 pr-5 py-4 bg-slate-50 border-2 border-slate-200 rounded-xl focus:ring-0 focus:border-blue-500 transition-colors font-bold text-slate-900 outline-none text-sm placeholder-slate-300" 
+                                    placeholder="Masukkan sandi...">
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn-interactive w-full py-4 bg-slate-900 hover:bg-blue-600 text-white rounded-xl font-black text-sm uppercase tracking-wider flex items-center justify-center space-x-2 mt-4 shadow-lg shadow-slate-900/20 transition-colors">
+                            <span>Masuk Dashboard</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Hiasan Background Login -->
+            <div class="absolute inset-0 overflow-hidden pointer-events-none opacity-40 z-10">
+                <div class="absolute top-1/4 -left-32 w-[30rem] h-[30rem] bg-blue-100 rounded-full filter blur-3xl opacity-60"></div>
+                <div class="absolute bottom-1/4 -right-32 w-[30rem] h-[30rem] bg-red-50 rounded-full filter blur-3xl opacity-60"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ==========================================
+         2. HUB MENU (APP LAYOUT)
+    =========================================== -->
+    <div id="view-hub" class="view-section fixed inset-0 z-40 bg-white dot-matrix flex-col items-center justify-center hidden overflow-y-auto p-6 md:p-12">
+        <div class="my-auto w-full max-w-5xl flex flex-col items-center">
+            
+            <div class="text-center mb-16 reveal-on-scroll">
+                <div class="inline-block px-4 py-1.5 bg-slate-100 text-slate-600 rounded-full font-bold text-[10px] uppercase tracking-widest mb-5 border border-slate-200">Mode Operasional</div>
+                <h1 class="text-4xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">Pilih Modul</h1>
+                <p class="text-slate-500 font-medium text-lg">Sistem Informasi Manajemen Tende Barber.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 w-full">
+                
+                <!-- Menu Kasir -->
+                <button onclick="openMode('pembayaran')" class="btn-interactive group bg-white border-2 border-slate-200 hover:border-blue-500 rounded-[2.5rem] p-8 flex flex-col items-center text-center shadow-sm h-80 relative overflow-hidden reveal-on-scroll">
+                    <div class="absolute inset-0 bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity z-0"></div>
+                    <div class="w-24 h-24 bg-slate-50 rounded-3xl flex items-center justify-center mb-8 group-hover:bg-blue-600 transition-all border border-slate-100 group-hover:border-blue-600 shadow-sm z-10 group-hover:scale-110">
+                        <i class="fas fa-desktop text-4xl text-slate-600 group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h2 class="text-2xl font-black text-slate-900 mb-3 z-10 group-hover:text-blue-700 transition-colors">POS Kasir</h2>
+                    <p class="text-slate-500 font-medium text-sm px-4 z-10">Transaksi pencukuran, input diskon, dan manajemen struk pembayaran.</p>
+                </button>
+
+                <!-- Menu Kapster -->
+                <button id="btn-menu-kapster" onclick="promptOwnerAuth('kapster')" class="btn-interactive group bg-slate-900 border-2 border-slate-900 hover:border-amber-500 rounded-[2.5rem] p-8 flex flex-col items-center text-center shadow-xl shadow-slate-900/10 h-80 relative overflow-hidden reveal-on-scroll" style="transition-delay: 100ms;">
+                    <div class="absolute inset-0 bg-gradient-to-b from-slate-800 to-slate-900 opacity-0 group-hover:opacity-100 transition-opacity z-0"></div>
+                    <div class="absolute top-6 right-6 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/50 group-hover:bg-amber-500 group-hover:text-white transition-colors z-10"><i class="fas fa-lock text-xs"></i></div>
+                    
+                    <div class="w-24 h-24 bg-slate-800 rounded-3xl flex items-center justify-center mb-8 group-hover:bg-amber-500 transition-all border border-slate-700 group-hover:border-amber-500 shadow-sm z-10 group-hover:scale-110">
+                        <i class="fas fa-users text-4xl text-slate-300 group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h2 class="text-2xl font-black text-white mb-3 z-10 group-hover:text-amber-400 transition-colors">Kapster Data</h2>
+                    <p class="text-slate-400 font-medium text-sm px-4 z-10">Pantau performa harian dan kalkulasi komisi otomatis kapster.</p>
+                </button>
+
+                <!-- Menu Owner -->
+                <button id="btn-menu-riwayat" onclick="promptOwnerAuth('riwayat')" class="btn-interactive group bg-slate-900 border-2 border-slate-900 hover:border-red-500 rounded-[2.5rem] p-8 flex flex-col items-center text-center shadow-xl shadow-slate-900/10 h-80 relative overflow-hidden reveal-on-scroll" style="transition-delay: 200ms;">
+                    <div class="absolute inset-0 bg-gradient-to-b from-slate-800 to-slate-900 opacity-0 group-hover:opacity-100 transition-opacity z-0"></div>
+                    <div class="absolute top-6 right-6 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/50 group-hover:bg-red-500 group-hover:text-white transition-colors z-10"><i class="fas fa-lock text-xs"></i></div>
+                    
+                    <div class="w-24 h-24 bg-slate-800 rounded-3xl flex items-center justify-center mb-8 group-hover:bg-red-500 transition-all border border-slate-700 group-hover:border-red-500 shadow-sm z-10 group-hover:scale-110">
+                        <i class="fas fa-chart-pie text-4xl text-slate-300 group-hover:text-white transition-colors"></i>
+                    </div>
+                    <h2 class="text-2xl font-black text-white mb-3 z-10 group-hover:text-red-400 transition-colors">Owner Report</h2>
+                    <p class="text-slate-400 font-medium text-sm px-4 z-10">Laporan keuangan bulanan, omset bersih, dan riwayat transaksi.</p>
+                </button>
+                
+            </div>
+            
+            <button onclick="logout()" class="btn-interactive mt-16 px-8 py-3.5 bg-white border-2 border-slate-200 rounded-full text-slate-600 font-black hover:text-red-600 hover:border-red-200 hover:bg-red-50 flex items-center shadow-sm text-sm transition-colors relative z-10 reveal-on-scroll">
+                <i class="fas fa-power-off mr-2"></i> Kunci Sesi
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ==========================================
+         3. MAIN APP LAYOUT (KASIR/KAPSTER/OWNER)
+    =========================================== -->
+    <div id="app-layout" class="hidden w-full h-screen flex flex-col bg-[#f8fafc] fixed inset-0 z-30">
+        
+        <!-- Header App -->
+        <header class="bg-white border-b border-slate-200 flex items-center justify-between px-6 h-20 shrink-0 z-30 shadow-sm">
+            <div class="flex items-center gap-4">
+                <button onclick="showHub()" class="btn-interactive w-10 h-10 flex items-center justify-center bg-slate-50 border border-slate-200 hover:border-slate-900 rounded-xl transition-colors text-slate-700 group">
+                    <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i> 
+                </button>
+                <div class="h-6 w-px bg-slate-200 mx-2 hidden sm:block"></div>
+                <h1 id="page-title" class="text-xl font-black text-slate-900 tracking-tight hidden sm:block">Dashboard</h1>
+            </div>
+            
+            <div class="flex items-center gap-5">
+                <div class="hidden lg:flex items-center gap-2 cursor-default">
+                    <div class="w-1.5 h-6 barber-pole rounded-full shadow-sm border border-slate-200"></div>
+                    <div class="font-black text-lg tracking-tighter text-slate-900">
+                        TENDEBARBER
+                    </div>
+                </div>
+
+                <!-- Global Date Picker -->
+                <div id="date-picker-container" class="relative bg-white border-2 border-slate-200 hover:border-blue-500 rounded-xl px-4 py-2 flex items-center transition-colors cursor-pointer shadow-sm group">
+                    <i class="fas fa-calendar-day text-slate-400 group-hover:text-blue-600 mr-3 transition-colors"></i>
+                    <div class="flex flex-col">
+                        <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1 group-hover:text-blue-500 transition-colors">Tanggal Transaksi</span>
+                        <span id="display-date" class="text-xs font-bold text-slate-900 leading-none">Pilih</span>
+                    </div>
+                    <input type="date" id="global-date" onchange="handleDateChange()" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+                </div>
+
+                <!-- Global Month Picker -->
+                <div id="month-picker-container" class="relative bg-white border-2 border-slate-200 hover:border-red-500 rounded-xl px-4 py-2 items-center transition-colors cursor-pointer shadow-sm group hidden">
+                    <i class="fas fa-calendar-alt text-slate-400 group-hover:text-red-500 mr-3 transition-colors"></i>
+                    <div class="flex flex-col">
+                        <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1 group-hover:text-red-400 transition-colors">Bulan Laporan</span>
+                        <span id="display-month" class="text-xs font-bold text-slate-900 leading-none">Pilih</span>
+                    </div>
+                    <input type="month" id="global-month" onchange="handleMonthChange()" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto w-full p-4 md:p-8 relative scroll-smooth bg-slate-50/50 dot-matrix">
+            
+            <!-- ================= VIEW: KASIR ================= -->
+            <div id="view-pembayaran" class="view-section flex-col hidden max-w-[1400px] mx-auto w-full">
+                <div class="flex flex-col xl:flex-row gap-8 items-start">
+                    
+                    <!-- Kiri: Pilihan -->
+                    <div class="w-full xl:flex-1 flex flex-col gap-8">
+                        <!-- Step 1: Kapster -->
+                        <section class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-md transition-shadow reveal-on-scroll">
+                            <h2 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-3">
+                                <span class="bg-blue-50 text-blue-600 w-7 h-7 rounded-full flex items-center justify-center text-xs border border-blue-100 shadow-sm">1</span> 
+                                Pilih Kapster
+                            </h2>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="kapster-selection">
+                                <!-- Rendered via JS -->
+                            </div>
+                        </section>
+
+                        <!-- Step 2: Layanan -->
+                        <section class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-md transition-shadow reveal-on-scroll">
+                            <h2 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-3">
+                                <span class="bg-blue-50 text-blue-600 w-7 h-7 rounded-full flex items-center justify-center text-xs border border-blue-100 shadow-sm">2</span> 
+                                Pilih Layanan
+                            </h2>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <div onclick="selectService('standar', 40000)" id="card-standar" class="btn-interactive cursor-pointer bg-white border-2 border-slate-200 rounded-[2rem] p-6 hover:border-blue-500 hover:bg-blue-50/30 relative group flex flex-col items-start justify-center">
+                                    <div class="w-14 h-14 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-center text-2xl mb-4 text-slate-400 group-hover:text-blue-600 group-hover:border-blue-200 group-hover:bg-blue-100 transition-colors shadow-sm">
+                                        <i class="fas fa-cut"></i>
+                                    </div>
+                                    <h3 class="text-xl font-black text-slate-900 mb-1 group-hover:text-blue-700 transition-colors">Cukur Standar</h3>
+                                    <p class="text-2xl font-black text-slate-500 group-hover:text-blue-600 transition-colors">Rp 40.000</p>
+                                    <div class="check-icon hidden absolute top-6 right-6 text-blue-600 text-2xl"><i class="fas fa-check-circle"></i></div>
+                                </div>
+
+                                <div onclick="selectService('premium', 50000)" id="card-premium" class="btn-interactive cursor-pointer bg-white border-2 border-slate-200 rounded-[2rem] p-6 hover:border-red-500 hover:bg-red-50/30 relative group flex flex-col items-start justify-center">
+                                    <div class="w-14 h-14 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-center text-2xl mb-4 text-slate-400 group-hover:text-red-500 group-hover:border-red-200 group-hover:bg-red-100 transition-colors shadow-sm">
+                                        <i class="fas fa-crown"></i>
+                                    </div>
+                                    <h3 class="text-xl font-black text-slate-900 mb-1 group-hover:text-red-600 transition-colors">Cukur Premium</h3>
+                                    <p class="text-2xl font-black text-slate-500 group-hover:text-red-500 transition-colors">Rp 50.000</p>
+                                    <div class="check-icon hidden absolute top-6 right-6 text-red-500 text-2xl"><i class="fas fa-check-circle"></i></div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Kanan: Struk -->
+                    <div class="w-full xl:w-[420px] shrink-0 bg-white rounded-[2.5rem] border border-slate-200 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] flex flex-col overflow-hidden self-start xl:sticky xl:top-8 group hover:border-slate-300 transition-colors reveal-on-scroll barber-accent-border">
+                        
+                        <div class="bg-slate-900 text-white p-7 flex justify-between items-center relative overflow-hidden">
+                            <div class="absolute -right-4 -top-4 opacity-10 text-6xl transform rotate-12"><i class="fas fa-receipt"></i></div>
+                            <div class="relative z-10">
+                                <h2 class="font-black text-xl tracking-wide uppercase">Tagihan</h2>
+                                <p class="text-xs font-bold text-slate-400 mt-1 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span> Order #<span id="queue-number">01</span></p>
+                            </div>
+                            <div class="relative z-10 text-xs font-bold bg-white/10 border border-white/20 px-3 py-1.5 rounded-lg flex items-center shadow-sm">
+                                <i class="far fa-clock mr-1.5"></i> <span id="real-time-clock">00:00</span>
+                            </div>
+                        </div>
+
+                        <div class="p-7 flex-1 flex flex-col space-y-7 bg-slate-50/50">
+                            
+                            <!-- Rincian -->
+                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Kapster</span>
+                                    <span id="ticket-kapster" class="font-black text-slate-900 bg-slate-50 px-2.5 py-1 rounded border border-slate-100">-</span>
+                                </div>
+                                <div class="border-b border-slate-100"></div>
+                                <div class="flex justify-between items-center text-sm">
+                                    <span class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Layanan</span>
+                                    <span id="ticket-service" class="font-black text-slate-900">-</span>
+                                </div>
+                            </div>
+
+                            <!-- Diskon -->
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Diskon (Rp)</label>
+                                <div class="relative flex items-center">
+                                    <span class="absolute left-4 font-black text-slate-400">Rp</span>
+                                    <input type="number" id="input-discount" value="0"
+                                        oninput="cleanInput(this); calculateTotal();" 
+                                        onfocus="if(this.value==='0') this.value=''"
+                                        onblur="if(this.value==='') this.value='0'"
+                                        class="w-full text-right bg-white border-2 border-slate-200 rounded-xl pl-12 pr-4 py-3 font-black text-slate-900 focus:border-blue-500 focus:ring-0 outline-none transition-colors text-lg shadow-sm">
+                                </div>
+                            </div>
+
+                            <!-- Metode Bayar -->
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Metode Bayar</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <button onclick="selectPaymentMethod('cash')" id="btn-pay-cash" class="btn-interactive interactive-element py-3.5 bg-white border-2 border-slate-200 rounded-xl font-bold text-sm text-slate-500 flex items-center justify-center gap-2 hover:border-green-500 hover:text-green-600 hover:bg-green-50/30 transition-colors shadow-sm">
+                                        <i class="fas fa-money-bill-wave"></i> CASH
+                                    </button>
+                                    <button onclick="selectPaymentMethod('qris')" id="btn-pay-qris" class="btn-interactive interactive-element py-3.5 bg-white border-2 border-slate-200 rounded-xl font-bold text-sm text-slate-500 flex items-center justify-center gap-2 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/30 transition-colors shadow-sm">
+                                        <i class="fas fa-qrcode"></i> QRIS
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Panel Cash Detail -->
+                            <div id="payment-details" class="hidden flex-col bg-white p-5 rounded-2xl border-2 border-green-200 shadow-sm space-y-4">
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest flex justify-between items-center">
+                                        <span>Uang Diterima</span>
+                                        <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[8px]">Auto</span>
+                                    </label>
+                                    <div class="relative flex items-center">
+                                        <span class="absolute left-4 font-black text-green-600 text-xl">Rp</span>
+                                        <input type="number" id="input-uang" value="0"
+                                            oninput="cleanInput(this); calculateKembalian();" 
+                                            onfocus="if(this.value==='0') this.value=''"
+                                            onblur="if(this.value==='') this.value='0'"
+                                            class="w-full text-right bg-green-50 border border-green-200 rounded-xl pl-12 pr-4 py-3 font-black text-green-700 focus:border-green-500 focus:ring-0 outline-none text-2xl shadow-inner transition-colors">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button onclick="setFastCash('uang_pas')" class="btn-interactive bg-white border border-slate-200 text-slate-600 py-2 rounded-lg text-xs font-bold hover:border-green-400 hover:bg-green-50 hover:text-green-700 transition-colors shadow-sm">PAS</button>
+                                    <button onclick="setFastCash(50000)" class="btn-interactive bg-white border border-slate-200 text-slate-600 py-2 rounded-lg text-xs font-bold hover:border-green-400 hover:bg-green-50 hover:text-green-700 transition-colors shadow-sm">50k</button>
+                                    <button onclick="setFastCash(100000)" class="btn-interactive bg-white border border-slate-200 text-slate-600 py-2 rounded-lg text-xs font-bold hover:border-green-400 hover:bg-green-50 hover:text-green-700 transition-colors shadow-sm">100k</button>
+                                </div>
+                                <div class="flex justify-between items-center pt-4 border-t border-slate-100 mt-2">
+                                    <span class="text-slate-500 font-bold text-xs uppercase tracking-widest">Kembalian</span>
+                                    <span id="ticket-kembalian" class="font-black text-green-500 text-2xl">Rp 0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pay Action -->
+                        <div class="p-7 bg-white border-t border-slate-200 space-y-5 rounded-b-[2.5rem]">
+                            <div class="flex justify-between items-end">
+                                <span class="text-slate-400 font-black text-[10px] uppercase tracking-widest mb-1">Total Bayar</span>
+                                <span id="ticket-total" class="text-4xl font-black text-slate-900 tracking-tighter">Rp 0</span>
+                            </div>
+                            <button onclick="processPayment()" class="btn-interactive interactive-element w-full py-4 bg-slate-900 hover:bg-blue-600 text-white rounded-xl font-black text-lg flex items-center justify-center gap-2 shadow-lg shadow-slate-900/20 hover:shadow-blue-600/30 transition-all border border-transparent hover:border-blue-400">
+                                <span>PROSES BAYAR</span> <i class="fas fa-check-circle"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW: KAPSTER (PRIVATE) ================= -->
+            <div id="view-kapster" class="view-section flex-col hidden max-w-6xl mx-auto w-full">
+                <div class="flex flex-col space-y-8">
+                    
+                    <div class="bg-slate-900 rounded-[2.5rem] p-8 md:p-10 text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl relative overflow-hidden reveal-on-scroll barber-accent-border">
+                        <div class="absolute -right-10 -bottom-10 text-white/5 text-9xl transform rotate-12 pointer-events-none"><i class="fas fa-users"></i></div>
+                        <div class="relative z-10">
+                            <div class="inline-flex items-center px-3 py-1 bg-white/10 rounded-full font-bold text-[10px] uppercase tracking-widest mb-4 border border-white/20"><i class="fas fa-lock mr-2 text-amber-400"></i> Owner Access Only</div>
+                            <h3 class="font-black text-3xl md:text-4xl mb-3 tracking-tight">Performa Kapster</h3>
+                            <p class="text-slate-400 text-sm max-w-xl leading-relaxed">Data jumlah pelanggan selesai per hari berdasarkan tanggal yang dipilih. Komisi harian otomatis dikalkulasi 5%.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="kapster-dashboard">
+                        <!-- Rendered via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= VIEW: RIWAYAT (OWNER) ================= -->
+            <div id="view-riwayat" class="view-section flex-col hidden max-w-7xl mx-auto w-full">
+                <div class="flex flex-col space-y-8">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-center relative overflow-hidden reveal-on-scroll">
+                            <div class="absolute -right-4 -bottom-4 text-slate-50 text-7xl"><i class="fas fa-wallet"></i></div>
+                            <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2 relative z-10"><i class="fas fa-wallet text-blue-500"></i> Total Omset Bulan Ini</h3>
+                            <p id="riwayat-omset" class="text-4xl font-black text-slate-900 tracking-tighter relative z-10">Rp 0</p>
+                        </div>
+                        <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-center relative overflow-hidden reveal-on-scroll" style="transition-delay: 100ms;">
+                            <div class="absolute -right-4 -bottom-4 text-slate-50 text-7xl"><i class="fas fa-hand-holding-usd"></i></div>
+                            <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2 relative z-10"><i class="fas fa-hand-holding-usd text-red-500"></i> Estimasi Gaji/Komisi</h3>
+                            <p id="riwayat-pengeluaran" class="text-4xl font-black text-slate-500 tracking-tighter relative z-10">Rp 0</p>
+                        </div>
+                        <div class="bg-slate-900 p-8 rounded-[2.5rem] border border-slate-900 text-white shadow-xl shadow-slate-900/20 flex flex-col justify-center relative overflow-hidden reveal-on-scroll barber-accent-border" style="transition-delay: 200ms;">
+                            <div class="absolute -right-4 -bottom-4 text-white/10 text-7xl"><i class="fas fa-chart-line"></i></div>
+                            <div class="relative z-10">
+                                <h3 class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2 flex items-center gap-2"><i class="fas fa-piggy-bank text-green-400"></i> Pendapatan Bersih (Net)</h3>
+                                <p id="riwayat-net" class="text-4xl font-black tracking-tighter text-white">Rp 0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Rekap Gaji Bulanan -->
+                        <div class="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col overflow-hidden reveal-on-scroll">
+                            <div class="p-6 md:p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                                <h2 class="font-black text-xl text-slate-900 tracking-tight flex items-center"><i class="fas fa-users text-blue-500 mr-3"></i> Rekap Gaji Kapster</h2>
+                                <span class="bg-white border border-slate-200 text-slate-600 text-[10px] font-bold px-3 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">Bulan Terpilih</span>
+                            </div>
+                            <div class="p-6 md:p-8 flex-1 overflow-y-auto max-h-[500px]">
+                                <div id="monthly-payroll-container" class="space-y-4">
+                                    <!-- Rendered via JS -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Detail Transaksi -->
+                        <div class="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col overflow-hidden reveal-on-scroll">
+                            <div class="p-6 md:p-8 border-b border-slate-100 bg-slate-50/50">
+                                <h2 class="font-black text-xl text-slate-900 tracking-tight flex items-center"><i class="fas fa-receipt text-red-500 mr-3"></i> Log Transaksi</h2>
+                            </div>
+                            <div class="p-0 flex-1 overflow-y-auto max-h-[500px]">
+                                <table class="w-full text-left border-collapse">
+                                    <thead class="sticky top-0 bg-white/95 backdrop-blur-sm z-10">
+                                        <tr class="text-slate-400 font-black text-[10px] uppercase tracking-widest border-b border-slate-200">
+                                            <th class="p-5">Waktu</th>
+                                            <th class="p-5">Detail</th>
+                                            <th class="p-5 text-right">Nominal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="transaction-table-body" class="text-sm font-semibold text-slate-700 divide-y divide-slate-100">
+                                        <!-- Rendered via JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ==========================================
+         4. MODALS
+    =========================================== -->
+    
+    <!-- Modal Owner Auth -->
+    <div id="modal-owner-auth" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[70] flex items-center justify-center hidden opacity-0 transition-opacity p-4">
+        <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl max-w-sm w-full transform scale-95 transition-transform" id="owner-auth-content">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-slate-50 border border-slate-200 text-slate-900 rounded-3xl flex items-center justify-center mx-auto mb-5 text-3xl shadow-sm">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3 class="text-2xl font-black text-slate-900 mb-2 tracking-tight">Otorisasi Owner</h3>
+                <p class="text-slate-500 text-xs font-bold uppercase tracking-widest">Demo PIN: 123456</p>
+            </div>
+            <input type="password" id="input-owner-pin" oninput="autoValidatePIN(this)" maxlength="6" class="w-full text-center tracking-[1em] font-black text-2xl py-4 border-2 border-slate-200 rounded-2xl mb-6 focus:border-blue-500 focus:ring-0 outline-none bg-slate-50 transition-colors" placeholder="••••••">
+            <button onclick="closeOwnerAuth()" class="btn-interactive w-full py-4 bg-white border border-slate-200 text-slate-600 font-black rounded-xl hover:bg-slate-50 transition-colors text-sm uppercase tracking-widest shadow-sm">Batal</button>
+        </div>
+    </div>
+
+    <!-- Modal Success -->
+    <div id="modal-success" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[70] flex items-center justify-center hidden opacity-0 transition-opacity p-4">
+        <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl max-w-sm w-full text-center transform scale-95 transition-transform border border-slate-200" id="modal-content">
+            <div class="w-24 h-24 bg-green-500 text-white rounded-3xl flex items-center justify-center mx-auto mb-6 text-4xl shadow-xl shadow-green-500/30">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3 class="text-2xl font-black text-slate-900 mb-3 tracking-tight">Berhasil!</h3>
+            <p class="text-slate-500 mb-8 text-sm font-medium leading-relaxed">Transaksi tersimpan dan telah masuk ke dalam laporan bulanan Owner.</p>
+            <button onclick="closeModal()" class="btn-interactive w-full py-4 bg-slate-900 hover:bg-blue-600 text-white font-black rounded-xl text-sm uppercase tracking-widest shadow-lg shadow-slate-900/20 transition-colors">Tutup & Order Baru</button>
+        </div>
+    </div>
+
+    <!-- Modal Alert -->
+    <div id="modal-alert" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[80] flex items-center justify-center hidden opacity-0 transition-opacity p-4">
+        <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl max-w-sm w-full text-center transform scale-95 transition-transform" id="modal-alert-content">
+            <div class="w-24 h-24 bg-red-50 border border-red-100 text-red-500 rounded-3xl flex items-center justify-center mx-auto mb-6 text-4xl shadow-sm">
+                <i id="alert-icon" class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 id="alert-title" class="text-2xl font-black text-slate-900 mb-3 tracking-tight">Peringatan</h3>
+            <p class="text-slate-500 mb-8 text-sm font-medium leading-relaxed" id="alert-message">Pesan error disini.</p>
+            <button onclick="closeAlert()" class="btn-interactive w-full py-4 bg-slate-900 text-white font-black rounded-xl text-sm uppercase tracking-widest shadow-lg shadow-slate-900/20">Mengerti</button>
+        </div>
+    </div>
+
+
+    <script>
+        /* =======================================
+           1. UI LOGIC (CURSOR, ANIMATIONS, CARD)
+           ======================================= */
+        
+        // --- Custom Cursor Dot & Ring Logic ---
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorRing = document.getElementById('cursor-ring');
+        
+        document.addEventListener('mousemove', (e) => {
+            // Update posisi kursor secara realtime
+            cursorDot.style.left = e.clientX + 'px';
+            cursorDot.style.top = e.clientY + 'px';
+            
+            // Ring mengikuti dengan sedikit delay karena ada transition di CSS
+            cursorRing.style.left = e.clientX + 'px';
+            cursorRing.style.top = e.clientY + 'px';
+        });
+
+        // Efek hover interaktif
+        function attachCursorHover() {
+            const interactables = document.querySelectorAll('a, button, input, select, .cursor-pointer, .interactive-element, .btn-interactive');
+            interactables.forEach(el => {
+                el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+                el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+            });
+        }
+        document.addEventListener('DOMContentLoaded', attachCursorHover);
+
+        // --- Scroll Reveal Animation (Berulang) ---
+        // Elemen akan memudar muncul saat masuk layar, dan kelasnya dicabut saat keluar
+        // sehingga jika discroll lagi (naik/turun), animasinya akan terulang.
+        document.addEventListener("DOMContentLoaded", () => {
+            const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                    } else {
+                        // Rahasia animasi berulang: hilangkan kelas saat keluar layar
+                        entry.target.classList.remove('is-visible'); 
+                    }
+                });
+            }, observerOptions);
+
+            function observeElements() {
+                document.querySelectorAll('.reveal-on-scroll').forEach((el) => {
+                    observer.observe(el);
+                });
+            }
+            observeElements();
+            window.reObserveElements = observeElements;
+        });
+
+        // --- Efek Ngetik (Typing Effect) ---
+        const creators = ["Raehan Hamdani.", "Cut Safira.", "Fivian Dwi Intan."];
+        let roleIndex = 0, charIndex = 0, isDeleting = false;
+        const typingEl = document.querySelector(".typed-text");
+        
+        function typeEffect() {
+            const currentRole = creators[roleIndex];
+            if (isDeleting) {
+                typingEl.textContent = currentRole.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typingEl.textContent = currentRole.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let typeSpeed = isDeleting ? 40 : 100;
+
+            if (!isDeleting && charIndex === currentRole.length) {
+                typeSpeed = 2500; // Pause setelah ngetik
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                roleIndex = (roleIndex + 1) % creators.length;
+                typeSpeed = 600; // Pause sebelum mulai nama baru
+            }
+            setTimeout(typeEffect, typeSpeed);
+        }
+
+        // --- Efek 3D Tilt Card (Mouse Tracking) ---
+        const cardContainer = document.getElementById('card-container');
+        const cardInner = document.getElementById('id-card');
+        
+        cardContainer.addEventListener('mousemove', (e) => {
+            cardInner.classList.add('tracking'); // Fast follow
+            const rect = cardContainer.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const rotateX = ((y - centerY) / centerY) * -15; 
+            const rotateY = ((x - centerX) / centerX) * 15;
+            
+            cardInner.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+
+        cardContainer.addEventListener('mouseleave', () => {
+            cardInner.classList.remove('tracking'); // Kembalikan ke transition CSS yg SANGAT LAMBAT
+            cardInner.style.transform = `rotateX(0deg) rotateY(0deg)`;
+        });
+
+        // --- Data Tim & Pergantian ---
+        const teamMembers = [
+            {
+                name: "Raehan Hamdani",
+                image: "foto/raehanhamdani.jpeg"
+            },
+            {
+                name: "Cut Safira",
+                image: "foto/cutsafira1.jpeg"
+            },
+            {
+                name: "Fivian Dwi Intan",
+                image: "foto/fiviandwiintan.jpeg"
+            }
+        ];
+
+        let currentMemberIndex = 0;
+        function cycleTeamMember() {
+            cardInner.classList.add('clicking');
+            setTimeout(() => cardInner.classList.remove('clicking'), 150);
+
+            currentMemberIndex = (currentMemberIndex + 1) % teamMembers.length;
+            const member = teamMembers[currentMemberIndex];
+            
+            const imgEl = document.getElementById('team-image');
+            const placeholderEl = document.getElementById('team-placeholder');
+            
+            imgEl.style.opacity = 0; 
+            
+            setTimeout(() => {
+                imgEl.classList.remove('hidden');
+                placeholderEl.classList.add('hidden');
+                
+                imgEl.src = member.image;
+                document.getElementById('team-name').innerText = member.name;
+                
+                imgEl.style.opacity = 1; 
+            }, 250);
+        }
+
+
+        /* =======================================
+           2. LOGIKA SISTEM POS & APP
+           ======================================= */
+        
+        const KOMISI_PERSEN = 0.05; // 5%
+        
+        let kapstersData = []; 
+        let transactions = []; 
+        let targetAdminMode = ''; 
+        let currentRole = null; 
+        let state = { selectedKapster: null, selectedService: null, serviceName: null, servicePrice: 0, discount: 0, paymentMethod: null, uangDiterima: 0, kembalian: 0, queue: 1 };
+
+        async function fetchKapstersData() {
+            try {
+                const response = await fetch('http://localhost:3000/api/kapsters');
+                const data = await response.json();
+                kapstersData = data.map(k => ({ id: k.id, name: k.nama, avatar: k.inisial }));
+                renderKapsterSelection();
+            } catch (error) {
+                console.error("Gagal terhubung ke DB:", error);
+            }
+        }
+
+        async function fetchTransactionsData() {
+            try {
+                const response = await fetch('http://localhost:3000/api/transactions');
+                const data = await response.json();
+                
+                transactions = data.map(t => {
+                    const dateObj = new Date(t.waktu_transaksi);
+                    const yyyy = dateObj.getFullYear();
+                    const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+                    const dd = String(dateObj.getDate()).padStart(2, '0');
+
+                    return {
+                        id: t.id,
+                        date: `${yyyy}-${mm}-${dd}`,
+                        time: dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+                        kapsterId: t.kapster_id,
+                        serviceName: t.nama_layanan || 'Layanan',
+                        omset: parseFloat(t.total_bayar),
+                        komisi: parseFloat(t.komisi_kapster),
+                        paymentMethod: t.metode_bayar.toUpperCase()
+                    };
+                });
+            } catch (error) {
+                console.error("Gagal menarik transaksi:", error);
+            }
+        }
+
+        const formatRp = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+
+        setInterval(() => {
+            const el = document.getElementById('real-time-clock');
+            if(el) el.innerText = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        }, 1000);
+
+        window.onload = () => {
+            setTimeout(typeEffect, 500); // Start typing effect
+            
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            
+            document.getElementById('global-date').value = `${yyyy}-${mm}-${dd}`;
+            document.getElementById('global-month').value = `${yyyy}-${mm}`;
+            
+            updateDisplayDate();
+            updateDisplayMonth();
+            
+            // Tarik data dari API MySQL saat web dimuat
+            fetchKapstersData();
+            fetchTransactionsData();
+        };
+
+        function handleDateChange() {
+            updateDisplayDate();
+            if(document.getElementById('view-kapster').classList.contains('active')) renderKapsterDashboard();
+        }
+
+        function handleMonthChange() {
+            updateDisplayMonth();
+            if (document.getElementById('view-riwayat').classList.contains('active')) renderRiwayat();
+        }
+
+        function updateDisplayDate() {
+            const val = document.getElementById('global-date').value;
+            if(val) document.getElementById('display-date').innerText = new Date(val).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short' });
+        }
+
+        function updateDisplayMonth() {
+            const val = document.getElementById('global-month').value;
+            if(val) document.getElementById('display-month').innerText = new Date(val.split('-')[0], val.split('-')[1] - 1, 1).toLocaleDateString('id-ID', { year: 'numeric', month: 'long' });
+        }
+
+        // --- Navigasi ---
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const role = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-password').value;
+            
+            // Validasi Sandi
+            if (role === 'kasir' && pass !== 'kasir123') {
+                return showAlert("Kata sandi Kasir salah!");
+            }
+            if (role === 'admin' && pass !== 'admin123') {
+                return showAlert("Kata sandi Admin salah!");
+            }
+            
+            currentRole = role;
+            
+            // Atur UI Menu Berdasarkan Role
+            const btnKapster = document.getElementById('btn-menu-kapster');
+            const btnRiwayat = document.getElementById('btn-menu-riwayat');
+            
+            if (currentRole === 'kasir') {
+                btnKapster.classList.add('grayscale', 'opacity-50');
+                btnRiwayat.classList.add('grayscale', 'opacity-50');
+            } else {
+                btnKapster.classList.remove('grayscale', 'opacity-50');
+                btnRiwayat.classList.remove('grayscale', 'opacity-50');
+            }
+
+            const wrapper = document.getElementById('wrapper-landing-login');
+            wrapper.style.opacity = '0';
+            
+            setTimeout(() => {
+                wrapper.classList.remove('active');
+                wrapper.classList.add('hidden');
+                
+                const hub = document.getElementById('view-hub');
+                hub.classList.remove('hidden');
+                setTimeout(() => hub.classList.add('active'), 50);
+            }, 400);
+        }
+
+        function showHub() {
+            document.getElementById('app-layout').classList.add('hidden');
+            const hub = document.getElementById('view-hub');
+            hub.classList.remove('hidden');
+            setTimeout(() => hub.classList.add('active'), 50);
+        }
+
+        function logout() {
+            document.getElementById('app-layout').classList.add('hidden');
+            document.getElementById('view-hub').classList.remove('active');
+            document.getElementById('view-hub').classList.add('hidden');
+            
+            const wrapper = document.getElementById('wrapper-landing-login');
+            wrapper.classList.remove('hidden');
+            
+            setTimeout(() => { 
+                wrapper.classList.add('active'); 
+                wrapper.style.opacity = '1';
+                window.scrollTo({ top: 0, behavior: 'smooth' }); 
+            }, 50);
+            
+            document.getElementById('login-password').value = '';
+            resetKasirState();
+        }
+
+        function openMode(modeName) {
+            document.getElementById('view-hub').classList.remove('active');
+            setTimeout(() => {
+                document.getElementById('view-hub').classList.add('hidden');
+                
+                const layout = document.getElementById('app-layout');
+                layout.classList.remove('hidden');
+                
+                const datePicker = document.getElementById('date-picker-container');
+                const monthPicker = document.getElementById('month-picker-container');
+                
+                if (modeName === 'riwayat') {
+                    datePicker.classList.add('hidden'); datePicker.classList.remove('flex');
+                    monthPicker.classList.remove('hidden'); monthPicker.classList.add('flex');
+                } else {
+                    monthPicker.classList.add('hidden'); monthPicker.classList.remove('flex');
+                    datePicker.classList.remove('hidden'); datePicker.classList.add('flex');
+                }
+
+                document.querySelectorAll('.view-section').forEach(el => {
+                    if(['view-pembayaran', 'view-kapster', 'view-riwayat'].includes(el.id)) {
+                        el.classList.add('hidden'); el.classList.remove('active');
+                    }
+                });
+
+                const activeView = document.getElementById('view-' + modeName);
+                activeView.classList.remove('hidden');
+                setTimeout(() => activeView.classList.add('active'), 50);
+
+                const titleEl = document.getElementById('page-title');
+                if(modeName === 'pembayaran') { 
+                    titleEl.innerText = 'POS Kasir';
+                }
+                else if(modeName === 'kapster') { 
+                    titleEl.innerText = 'Kapster Data'; 
+                    renderKapsterDashboard(); 
+                }
+                else if(modeName === 'riwayat') { 
+                    titleEl.innerText = 'Owner Report'; 
+                    renderRiwayat(); 
+                }
+
+                // Restart Scroll Observer and Hover states di halaman baru
+                setTimeout(() => {
+                    if(window.reObserveElements) window.reObserveElements();
+                    attachCursorHover();
+                }, 100);
+            }, 300);
+        }
+
+        // --- Modals ---
+        function promptOwnerAuth(targetMode) {
+            if (currentRole === 'kasir') {
+                return showAlert("Akses Ditolak! Hanya Admin yang dapat mengakses menu ini.");
+            }
+            
+            targetAdminMode = targetMode; 
+            document.getElementById('input-owner-pin').value = '';
+            const modal = document.getElementById('modal-owner-auth');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                document.getElementById('owner-auth-content').classList.remove('scale-95');
+                document.getElementById('input-owner-pin').focus();
+            }, 10);
+        }
+
+        function closeOwnerAuth() {
+            const modal = document.getElementById('modal-owner-auth');
+            modal.classList.add('opacity-0');
+            document.getElementById('owner-auth-content').classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function autoValidatePIN(element) {
+            const pin = element.value;
+            if(pin.length === 6) {
+                if(pin === '123456') {
+                    closeOwnerAuth();
+                    setTimeout(() => openMode(targetAdminMode), 100);
+                } else {
+                    showAlert("PIN Salah! Akses ditolak.");
+                    element.value = '';
+                }
+            }
+        }
+
+        function cleanInput(element) {
+            let val = element.value.replace(/\D/g, ''); 
+            if(val.length > 1 && val.startsWith('0')) val = val.replace(/^0+/, '');
+            if(val === '') val = '0';
+            element.value = val;
+        }
+
+        /* --- KASIR LOGIC --- */
+        function renderKapsterSelection() {
+            const container = document.getElementById('kapster-selection');
+            container.innerHTML = '';
+            kapstersData.forEach(k => {
+                container.innerHTML += `
+                    <div onclick="selectKapster('${k.id}', '${k.name}')" id="sel-kapster-${k.id}" 
+                         class="btn-interactive interactive-element cursor-pointer bg-white border-2 border-slate-200 rounded-3xl p-4 flex flex-col items-center hover:border-blue-500 transition-all select-none group shadow-sm">
+                        <div id="avatar-${k.id}" class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center font-black text-2xl mb-3 transition-colors shadow-sm group-hover:text-blue-600 group-hover:border-blue-200 group-hover:bg-blue-50">
+                            ${k.avatar}
+                        </div>
+                        <span class="font-black text-slate-700 text-xs uppercase tracking-widest group-hover:text-blue-700 transition-colors">${k.name}</span>
+                    </div>
+                `;
+            });
+        }
+
+        function selectKapster(id, name) {
+            state.selectedKapster = id;
+            kapstersData.forEach(k => {
+                const el = document.getElementById(`sel-kapster-${k.id}`);
+                const avatar = document.getElementById(`avatar-${k.id}`);
+                el.classList.remove('border-blue-600', 'bg-blue-50/50');
+                el.classList.add('border-slate-200', 'bg-white');
+                el.querySelector('span').classList.remove('text-blue-700');
+                el.querySelector('span').classList.add('text-slate-700');
+                avatar.classList.remove('border-blue-200', 'bg-blue-100', 'text-blue-600');
+                avatar.classList.add('border-slate-200', 'bg-slate-50', 'text-slate-400');
+            });
+            
+            const selectedEl = document.getElementById(`sel-kapster-${id}`);
+            const selectedAvatar = document.getElementById(`avatar-${id}`);
+            selectedEl.classList.remove('border-slate-200', 'bg-white');
+            selectedEl.classList.add('border-blue-600', 'bg-blue-50/50');
+            selectedEl.querySelector('span').classList.remove('text-slate-700');
+            selectedEl.querySelector('span').classList.add('text-blue-700');
+            selectedAvatar.classList.remove('border-slate-200', 'bg-slate-50', 'text-slate-400');
+            selectedAvatar.classList.add('border-blue-200', 'bg-blue-100', 'text-blue-600');
+
+            document.getElementById('ticket-kapster').innerText = name;
+        }
+
+        function selectService(type, price) {
+            state.selectedService = type;
+            state.servicePrice = price;
+            state.serviceName = type === 'standar' ? 'Cukur Standar' : 'Cukur Premium';
+
+            document.getElementById('card-standar').classList.remove('border-blue-500', 'ring-2', 'ring-blue-500', 'bg-blue-50/30');
+            document.getElementById('card-premium').classList.remove('border-red-500', 'ring-2', 'ring-red-500', 'bg-red-50/30');
+            document.querySelector('#card-standar .check-icon').classList.add('hidden');
+            document.querySelector('#card-premium .check-icon').classList.add('hidden');
+
+            const activeCard = document.getElementById(`card-${type}`);
+            if (type === 'standar') {
+                activeCard.classList.add('border-blue-500', 'ring-2', 'ring-blue-500', 'bg-blue-50/30');
+            } else {
+                activeCard.classList.add('border-red-500', 'ring-2', 'ring-red-500', 'bg-red-50/30');
+            }
+            activeCard.querySelector('.check-icon').classList.remove('hidden');
+
+            document.getElementById('ticket-service').innerText = `${state.serviceName}`;
+            
+            let discountInput = parseInt(document.getElementById('input-discount').value) || 0;
+            if(discountInput > state.servicePrice) document.getElementById('input-discount').value = state.servicePrice;
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            if(!state.selectedService) return;
+            let discountInput = parseInt(document.getElementById('input-discount').value) || 0;
+            if(discountInput > state.servicePrice) { discountInput = state.servicePrice; document.getElementById('input-discount').value = discountInput; }
+            state.discount = discountInput;
+            const totalBayar = state.servicePrice - state.discount;
+            document.getElementById('ticket-total').innerText = formatRp(totalBayar);
+            if(state.paymentMethod === 'cash') calculateKembalian();
+        }
+
+        function selectPaymentMethod(method) {
+            state.paymentMethod = method;
+            document.getElementById('btn-pay-cash').classList.remove('border-green-500', 'bg-green-50', 'text-green-600');
+            document.getElementById('btn-pay-qris').classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-600');
+            document.getElementById('btn-pay-cash').classList.add('border-slate-200', 'bg-white', 'text-slate-500');
+            document.getElementById('btn-pay-qris').classList.add('border-slate-200', 'bg-white', 'text-slate-500');
+
+            const paymentDetails = document.getElementById('payment-details');
+            const totalBayar = state.servicePrice - state.discount;
+
+            if(method === 'cash') {
+                document.getElementById('btn-pay-cash').classList.add('border-green-500', 'bg-green-50', 'text-green-600');
+                document.getElementById('btn-pay-cash').classList.remove('border-slate-200', 'bg-white', 'text-slate-500');
+                paymentDetails.classList.remove('hidden'); paymentDetails.classList.add('flex');
+                if(parseInt(document.getElementById('input-uang').value) === 0 && totalBayar > 0) document.getElementById('input-uang').value = totalBayar;
+                calculateKembalian();
+            } else {
+                document.getElementById('btn-pay-qris').classList.add('border-blue-500', 'bg-blue-50', 'text-blue-600');
+                document.getElementById('btn-pay-qris').classList.remove('border-slate-200', 'bg-white', 'text-slate-500');
+                paymentDetails.classList.add('hidden'); paymentDetails.classList.remove('flex');
+                document.getElementById('input-uang').value = 0; state.uangDiterima = 0; state.kembalian = 0;
+            }
+        }
+
+        function setFastCash(nominal) {
+            if(!state.selectedService) return;
+            const inputUang = document.getElementById('input-uang');
+            const totalBayar = state.servicePrice - state.discount;
+            inputUang.value = nominal === 'uang_pas' ? (totalBayar > 0 ? totalBayar : 0) : nominal;
+            calculateKembalian();
+        }
+
+        function calculateKembalian() {
+            const totalBayar = state.servicePrice - state.discount;
+            let uang = parseInt(document.getElementById('input-uang').value) || 0;
+            state.uangDiterima = uang;
+            state.kembalian = uang - totalBayar;
+            
+            const kembalianEl = document.getElementById('ticket-kembalian');
+            if(state.kembalian < 0) {
+                kembalianEl.innerText = "Kurang!"; kembalianEl.classList.add('text-red-500'); kembalianEl.classList.remove('text-green-500');
+            } else {
+                kembalianEl.innerText = formatRp(state.kembalian); kembalianEl.classList.remove('text-red-500'); kembalianEl.classList.add('text-green-500');
+            }
+        }
+
+        async function processPayment() {
+            if(!state.selectedKapster) return showAlert("Pilih Kapster terlebih dahulu.");
+            if(!state.selectedService) return showAlert("Pilih Layanan terlebih dahulu.");
+            if(!state.paymentMethod) return showAlert("Pilih Metode Bayar.");
+            const finalUang = state.servicePrice - state.discount;
+            if(finalUang <= 0 && state.servicePrice === 0) return showAlert("Tagihan kosong.");
+            if(state.paymentMethod === 'cash' && state.uangDiterima < finalUang) return showAlert("Uang kurang dari total bayar!");
+
+            const tDate = document.getElementById('global-date').value;
+            const tTime = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
+            const dateTimeForDB = `${tDate} ${tTime}:00`; 
+            
+            const komisi = finalUang * KOMISI_PERSEN;
+            const serviceId = state.selectedService === 'standar' ? 1 : 2;
+
+            const payload = {
+                id: 'TRX' + Date.now(),
+                waktu_transaksi: dateTimeForDB,
+                kapster_id: state.selectedKapster,
+                service_id: serviceId,
+                diskon: state.discount,
+                total_bayar: finalUang,
+                komisi_kapster: komisi,
+                metode_bayar: state.paymentMethod
+            };
+
+            try {
+                const response = await fetch('http://localhost:3000/api/transactions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                if(result.success) {
+                    await fetchTransactionsData(); // Update lokal data
+                    
+                    const modal = document.getElementById('modal-success');
+                    modal.classList.remove('hidden');
+                    setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('modal-content').classList.remove('scale-95'); }, 10);
+                } else {
+                    showAlert("Gagal menyimpan ke database.");
+                }
+            } catch (error) {
+                console.error("Gagal Posting:", error);
+                showAlert("Terjadi kesalahan jaringan/server saat menyimpan transaksi.");
+            }
+        }
+
+        function resetKasirState() {
+            state.queue += 1;
+            document.getElementById('queue-number').innerText = state.queue.toString().padStart(2, '0');
+            state.selectedKapster = null; state.selectedService = null; state.servicePrice = 0; state.discount = 0; state.paymentMethod = null; state.uangDiterima = 0; state.kembalian = 0;
+
+            renderKapsterSelection(); 
+            document.getElementById('card-standar').className = 'btn-interactive cursor-pointer bg-white border-2 border-slate-200 rounded-[2rem] p-6 hover:border-blue-500 hover:bg-blue-50/30 relative group flex flex-col items-start justify-center';
+            document.getElementById('card-premium').className = 'btn-interactive cursor-pointer bg-white border-2 border-slate-200 rounded-[2rem] p-6 hover:border-red-500 hover:bg-red-50/30 relative group flex flex-col items-start justify-center';
+            document.querySelectorAll('.check-icon').forEach(el => el.classList.add('hidden'));
+            
+            document.getElementById('btn-pay-cash').className = 'btn-interactive interactive-element py-3.5 bg-white border-2 border-slate-200 rounded-xl font-bold text-sm text-slate-500 flex items-center justify-center gap-2 hover:border-green-500 hover:text-green-600 hover:bg-green-50/30 transition-colors shadow-sm';
+            document.getElementById('btn-pay-qris').className = 'btn-interactive interactive-element py-3.5 bg-white border-2 border-slate-200 rounded-xl font-bold text-sm text-slate-500 flex items-center justify-center gap-2 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/30 transition-colors shadow-sm';
+
+            document.getElementById('payment-details').classList.replace('flex', 'hidden');
+            document.getElementById('input-discount').value = '0';
+            document.getElementById('input-uang').value = '0';
+            document.getElementById('ticket-kembalian').innerText = 'Rp 0';
+            document.getElementById('ticket-kembalian').classList.replace('text-red-500', 'text-green-500');
+            document.getElementById('ticket-kapster').innerText = '-';
+            document.getElementById('ticket-service').innerText = '-';
+            document.getElementById('ticket-total').innerText = 'Rp 0';
+        }
+
+        /* --- DASHBOARD LOGIC --- */
+        function getAggregatedStats(targetDateStr, filterBy = 'date') {
+            let stats = {};
+            kapstersData.forEach(k => { stats[k.id] = { ...k, count: 0, omset: 0, komisi: 0 }; });
+            transactions.forEach(trx => {
+                const match = filterBy === 'date' ? trx.date === targetDateStr : trx.date.startsWith(targetDateStr);
+                if(match && stats[trx.kapsterId]) {
+                    stats[trx.kapsterId].count += 1;
+                    stats[trx.kapsterId].omset += trx.omset;
+                    stats[trx.kapsterId].komisi += trx.komisi;
+                }
+            });
+            return stats;
+        }
+
+        function renderKapsterDashboard() {
+            const container = document.getElementById('kapster-dashboard');
+            container.innerHTML = '';
+            const stats = getAggregatedStats(document.getElementById('global-date').value, 'date');
+
+            Object.values(stats).forEach(k => {
+                container.innerHTML += `
+                    <div class="bg-white rounded-[2.5rem] p-8 border border-slate-200 shadow-sm flex flex-col h-full hover:shadow-lg transition-shadow reveal-on-scroll barber-accent-border">
+                        <div class="flex items-center gap-4 mb-8">
+                            <div class="w-16 h-16 bg-slate-50 border border-slate-200 text-slate-500 rounded-2xl flex items-center justify-center font-black text-2xl shadow-inner">
+                                ${k.avatar}
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-black text-slate-900 uppercase tracking-tight mb-1">${k.name}</h3>
+                                <span class="bg-blue-50 text-blue-600 px-2 py-1 rounded text-[10px] font-bold">ID: ${k.id}</span>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mt-auto">
+                            <div class="flex justify-between items-center bg-slate-50 px-5 py-4 rounded-2xl border border-slate-100">
+                                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Pelanggan</span>
+                                <span class="font-black text-slate-900 text-lg">${k.count} <span class="text-[10px] font-bold text-slate-400">org</span></span>
+                            </div>
+                            <div class="flex justify-between items-center bg-slate-900 text-white px-5 py-4 rounded-2xl shadow-md border-b-2 border-amber-500">
+                                <span class="text-[10px] font-black uppercase tracking-widest text-slate-300">Komisi</span>
+                                <span class="font-black text-lg text-amber-400">${formatRp(k.komisi)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Trigger ulang observer animasi untuk elemen yang baru dirender setelah ganti tanggal
+            setTimeout(() => {
+                if (window.reObserveElements) window.reObserveElements();
+            }, 50);
+        }
+
+        function renderRiwayat() {
+            const targetMonth = document.getElementById('global-month').value; 
+            const trxs = transactions.filter(t => t.date.startsWith(targetMonth));
+            const stats = getAggregatedStats(targetMonth, 'month');
+
+            let totalOmset = 0, totalPengeluaran = 0; 
+            trxs.forEach(trx => { totalOmset += trx.omset; totalPengeluaran += trx.komisi; });
+
+            document.getElementById('riwayat-omset').innerText = formatRp(totalOmset);
+            document.getElementById('riwayat-pengeluaran').innerText = formatRp(totalPengeluaran);
+            document.getElementById('riwayat-net').innerText = formatRp(totalOmset - totalPengeluaran);
+
+            const tbody = document.getElementById('transaction-table-body');
+            tbody.innerHTML = '';
+            if(trxs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="p-8 text-center text-slate-400 text-xs font-bold uppercase tracking-widest">Tidak ada transaksi</td></tr>`;
+            } else {
+                [...trxs].reverse().forEach(t => {
+                    const kName = kapstersData.find(k => k.id === t.kapsterId)?.name || 'Unknown';
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="p-5 whitespace-nowrap">
+                                <span class="text-xs font-black text-slate-900 bg-slate-100 px-2 py-1 rounded">Tgl ${t.date.split('-')[2]}</span><br>
+                                <span class="text-[10px] font-bold text-blue-500 mt-1 block">${t.time}</span>
+                            </td>
+                            <td class="p-5">
+                                <span class="font-black text-slate-800 text-sm uppercase">${kName}</span><br>
+                                <span class="text-[10px] font-bold text-slate-500">${t.serviceName} &bull; ${t.paymentMethod}</span>
+                            </td>
+                            <td class="p-5 font-black text-slate-900 text-right text-sm">${formatRp(t.omset)}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            const containerPayroll = document.getElementById('monthly-payroll-container');
+            containerPayroll.innerHTML = '';
+            Object.values(stats).forEach(k => {
+                containerPayroll.innerHTML += `
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between hover:border-blue-500 transition-colors cursor-default group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-slate-50 text-slate-600 rounded-xl flex items-center justify-center font-black text-lg border border-slate-200 shadow-inner group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-200 transition-colors">
+                                ${k.avatar}
+                            </div>
+                            <div>
+                                <h4 class="font-black text-slate-900 text-sm uppercase tracking-wide mb-1 group-hover:text-blue-700 transition-colors">${k.name}</h4>
+                                <p class="text-[10px] font-bold text-slate-500 bg-slate-50 px-2 py-0.5 rounded border border-slate-100 inline-block">${k.count} Diselesaikan</p>
+                            </div>
+                        </div>
+                        <div class="text-right flex flex-col items-end">
+                            <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Gaji Bersih</span>
+                            <p class="text-lg font-black text-green-600 leading-none">${formatRp(k.komisi)}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Trigger ulang observer animasi untuk elemen yang baru dirender setelah ganti bulan
+            setTimeout(() => {
+                if (window.reObserveElements) window.reObserveElements();
+            }, 50);
+        }
+
+        /* --- Modals Helper --- */
+        function showAlert(msg) {
+            document.getElementById('alert-message').innerText = msg;
+            const modal = document.getElementById('modal-alert');
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('modal-alert-content').classList.remove('scale-95'); }, 10);
+        }
+
+        function closeAlert() {
+            const modal = document.getElementById('modal-alert');
+            modal.classList.add('opacity-0'); document.getElementById('modal-alert-content').classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal-success');
+            modal.classList.add('opacity-0'); document.getElementById('modal-content').classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); resetKasirState(); }, 300);
+        }
+    </script>
+</body>
+</html>
