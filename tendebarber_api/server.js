@@ -76,4 +76,4 @@ app.post('/api/transactions', (req, res) => {
 
 app.listen(port, () => {
     console.log(`🚀 Server berjalan di http://localhost:${port}`);
-// }); // SENGAJA DI-ERROR-KAN: Kurung penutup dikomentari agar memicu build failure di CI
+});
