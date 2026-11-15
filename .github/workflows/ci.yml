@@ -2,14 +2,7 @@ name: CI Pipeline (Build & Test)
 
 on:
   push:
-    branches:
-      - main
-      - master
-      - ci-pipeline
   pull_request:
-    branches:
-      - main
-      - master
   workflow_dispatch:
 
 jobs:
