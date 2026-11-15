@@ -1,0 +1,59 @@
+name: CI Pipeline (Build & Test)
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - ci-pipeline
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: Build & Test (Node.js ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+
+    defaults:
+      run:
+        working-directory: tendebarber_api
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: tendebarber_api/package-lock.json
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🛠️ Build / Syntax Check
+        run: npm run build
+
+      - name: 🧪 Run Automated Tests
+        run: npm test
+
+  frontend-check:
+    name: Frontend Sanity Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔍 Verifikasi File Frontend
+        run: |
+          test -f index.html || (echo "index.html tidak ditemukan!" && exit 1)
+          echo "✅ File index.html tersedia."
