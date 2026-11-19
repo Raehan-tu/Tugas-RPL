@@ -91,7 +91,7 @@
         /* --- TYPING EFFECT --- */
         .cursor-type {
             display: inline-block;
-            width: 3px;
+            width: 3px; 
             background-color: #0f172a;
             margin-left: 4px;
             animation: blink 1s infinite;
@@ -475,7 +475,30 @@
                                 Pilih Kapster
                             </h2>
                             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="kapster-selection">
-                                <!-- Rendered via JS -->
+                                <div onclick="selectKapster('KP001', 'Faqih')" id="sel-kapster-KP001" class="btn-interactive interactive-element cursor-pointer bg-white border-2 border-slate-200 rounded-3xl p-4 flex flex-col items-center hover:border-blue-500 transition-all select-none group shadow-sm">
+                                    <div id="avatar-KP001" class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center font-black text-2xl mb-3 transition-colors shadow-sm group-hover:text-blue-600 group-hover:border-blue-200 group-hover:bg-blue-50">
+                                        F
+                                    </div>
+                                    <span class="font-black text-slate-700 text-xs uppercase tracking-widest group-hover:text-blue-700 transition-colors">Faqih</span>
+                                </div>
+                                <div onclick="selectKapster('KP002', 'Budi')" id="sel-kapster-KP002" class="btn-interactive interactive-element cursor-pointer bg-white border-2 border-slate-200 rounded-3xl p-4 flex flex-col items-center hover:border-blue-500 transition-all select-none group shadow-sm">
+                                    <div id="avatar-KP002" class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center font-black text-2xl mb-3 transition-colors shadow-sm group-hover:text-blue-600 group-hover:border-blue-200 group-hover:bg-blue-50">
+                                        B
+                                    </div>
+                                    <span class="font-black text-slate-700 text-xs uppercase tracking-widest group-hover:text-blue-700 transition-colors">Budi</span>
+                                </div>
+                                <div onclick="selectKapster('KP003', 'Rian')" id="sel-kapster-KP003" class="btn-interactive interactive-element cursor-pointer bg-white border-2 border-slate-200 rounded-3xl p-4 flex flex-col items-center hover:border-blue-500 transition-all select-none group shadow-sm">
+                                    <div id="avatar-KP003" class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center font-black text-2xl mb-3 transition-colors shadow-sm group-hover:text-blue-600 group-hover:border-blue-200 group-hover:bg-blue-50">
+                                        R
+                                    </div>
+                                    <span class="font-black text-slate-700 text-xs uppercase tracking-widest group-hover:text-blue-700 transition-colors">Rian</span>
+                                </div>
+                                <div onclick="selectKapster('KP004', 'Arif')" id="sel-kapster-KP004" class="btn-interactive interactive-element cursor-pointer bg-white border-2 border-slate-200 rounded-3xl p-4 flex flex-col items-center hover:border-blue-500 transition-all select-none group shadow-sm">
+                                    <div id="avatar-KP004" class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center font-black text-2xl mb-3 transition-colors shadow-sm group-hover:text-blue-600 group-hover:border-blue-200 group-hover:bg-blue-50">
+                                        A
+                                    </div>
+                                    <span class="font-black text-slate-700 text-xs uppercase tracking-widest group-hover:text-blue-700 transition-colors">Arif</span>
+                                </div>
                             </div>
                         </section>
 
@@ -884,7 +907,13 @@
         
         const KOMISI_PERSEN = 0.05; // 5%
         
-        let kapstersData = []; 
+        // Data kapster default (sesuai database tendebarber_db) agar tampilan tidak kosong saat backend/API dimuat
+        let kapstersData = [
+            { id: 'KP001', name: 'Faqih', avatar: 'F' },
+            { id: 'KP002', name: 'Budi', avatar: 'B' },
+            { id: 'KP003', name: 'Rian', avatar: 'R' },
+            { id: 'KP004', name: 'Arif', avatar: 'A' }
+        ]; 
         let transactions = []; 
         let targetAdminMode = ''; 
         let currentRole = null; 
@@ -893,11 +922,15 @@
         async function fetchKapstersData() {
             try {
                 const response = await fetch('http://localhost:3000/api/kapsters');
+                if (!response.ok) throw new Error('HTTP ' + response.status);
                 const data = await response.json();
-                kapstersData = data.map(k => ({ id: k.id, name: k.nama, avatar: k.inisial }));
-                renderKapsterSelection();
+                if (Array.isArray(data) && data.length > 0) {
+                    kapstersData = data.map(k => ({ id: k.id, name: k.nama, avatar: k.inisial }));
+                    renderKapsterSelection();
+                }
             } catch (error) {
-                console.error("Gagal terhubung ke DB:", error);
+                console.warn("API/DB backend belum aktif atau gagal koneksi, menggunakan data kapster lokal:", error);
+                renderKapsterSelection();
             }
         }
 
@@ -949,6 +982,9 @@
             updateDisplayDate();
             updateDisplayMonth();
             
+            // Render pilihan kapster segera saat web dibuka
+            renderKapsterSelection();
+
             // Tarik data dari API MySQL saat web dimuat
             fetchKapstersData();
             fetchTransactionsData();
@@ -1073,6 +1109,7 @@
                 const titleEl = document.getElementById('page-title');
                 if(modeName === 'pembayaran') { 
                     titleEl.innerText = 'POS Kasir';
+                    renderKapsterSelection();
                 }
                 else if(modeName === 'kapster') { 
                     titleEl.innerText = 'Kapster Data'; 
@@ -1138,18 +1175,21 @@
         /* --- KASIR LOGIC --- */
         function renderKapsterSelection() {
             const container = document.getElementById('kapster-selection');
+            if(!container) return;
             container.innerHTML = '';
             kapstersData.forEach(k => {
+                const isSelected = state.selectedKapster === k.id;
                 container.innerHTML += `
                     <div onclick="selectKapster('${k.id}', '${k.name}')" id="sel-kapster-${k.id}" 
-                         class="btn-interactive interactive-element cursor-pointer bg-white border-2 border-slate-200 rounded-3xl p-4 flex flex-col items-center hover:border-blue-500 transition-all select-none group shadow-sm">
-                        <div id="avatar-${k.id}" class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center font-black text-2xl mb-3 transition-colors shadow-sm group-hover:text-blue-600 group-hover:border-blue-200 group-hover:bg-blue-50">
+                         class="btn-interactive interactive-element cursor-pointer bg-white border-2 ${isSelected ? 'border-blue-600 bg-blue-50/50' : 'border-slate-200'} rounded-3xl p-4 flex flex-col items-center hover:border-blue-500 transition-all select-none group shadow-sm">
+                        <div id="avatar-${k.id}" class="w-14 h-14 rounded-2xl ${isSelected ? 'border-blue-200 bg-blue-100 text-blue-600' : 'bg-slate-50 border-slate-200 text-slate-400'} border flex items-center justify-center font-black text-2xl mb-3 transition-colors shadow-sm group-hover:text-blue-600 group-hover:border-blue-200 group-hover:bg-blue-50">
                             ${k.avatar}
                         </div>
-                        <span class="font-black text-slate-700 text-xs uppercase tracking-widest group-hover:text-blue-700 transition-colors">${k.name}</span>
+                        <span class="font-black ${isSelected ? 'text-blue-700' : 'text-slate-700'} text-xs uppercase tracking-widest group-hover:text-blue-700 transition-colors">${k.name}</span>
                     </div>
                 `;
             });
+            if(typeof attachCursorHover === 'function') attachCursorHover();
         }
 
         function selectKapster(id, name) {
