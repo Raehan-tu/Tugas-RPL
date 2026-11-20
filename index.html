@@ -8,9 +8,56 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        /* --- SEMBUNYIKAN KURSOR BAWAAN --- */
-        *, *::before, *::after {
-            cursor: none !important;
+        /* --- KURSOR CUSTOM: HANYA AKTIF PADA PERANGKAT DESKTOP (MOUSE) --- */
+        @media (hover: hover) and (pointer: fine) {
+            *, *::before, *::after {
+                cursor: none !important;
+            }
+
+            #cursor-dot {
+                width: 8px;
+                height: 8px;
+                background-color: #0f172a;
+                border-radius: 50%;
+                position: fixed;
+                pointer-events: none;
+                z-index: 999999;
+                transform: translate(-50%, -50%);
+                transition: transform 0.1s ease-out, background-color 0.3s ease;
+                will-change: left, top, transform;
+            }
+
+            #cursor-ring {
+                width: 36px;
+                height: 36px;
+                border: 2px solid rgba(15, 23, 42, 0.3);
+                border-radius: 50%;
+                position: fixed;
+                pointer-events: none;
+                z-index: 999998;
+                transform: translate(-50%, -50%);
+                transition: transform 0.15s ease-out, width 0.3s, height 0.3s, border-color 0.3s;
+                will-change: left, top, transform;
+            }
+            
+            .hovering #cursor-dot {
+                transform: translate(-50%, -50%) scale(0.5);
+                background-color: #ef4444;
+            }
+
+            .hovering #cursor-ring {
+                width: 50px;
+                height: 50px;
+                border-color: rgba(59, 130, 246, 0.4);
+                background-color: rgba(59, 130, 246, 0.05);
+            }
+        }
+
+        /* --- HP / TABLET / TOUCHSCREEN: SEMBUNYIKAN KURSOR CUSTOM & GUNAKAN KURSOR NORMAL --- */
+        @media (hover: none) or (pointer: coarse) {
+            #cursor-dot, #cursor-ring {
+                display: none !important;
+            }
         }
 
         body {
@@ -18,45 +65,7 @@
             background-color: #ffffff;
             color: #0f172a;
             overflow-x: hidden;
-        }
-
-        /* --- KURSOR CUSTOM DOT & RING (Sesuai Referensi Gambar) --- */
-        #cursor-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #0f172a; /* Titik hitam/gelap */
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 999999;
-            transform: translate(-50%, -50%);
-            transition: transform 0.1s ease-out, background-color 0.3s ease;
-            will-change: left, top, transform;
-        }
-        #cursor-ring {
-            width: 36px;
-            height: 36px;
-            border: 2px solid rgba(15, 23, 42, 0.3); /* Lingkaran garis luar */
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            z-index: 999998;
-            transform: translate(-50%, -50%);
-            /* Animasi mengikuti sedikit delay alami bawaan transisi ini */
-            transition: transform 0.15s ease-out, width 0.3s, height 0.3s, border-color 0.3s;
-            will-change: left, top, transform;
-        }
-        
-        /* Efek saat kursor hover di tombol/interaktif */
-        .hovering #cursor-dot {
-            transform: translate(-50%, -50%) scale(0.5);
-            background-color: #ef4444; /* Merah aksen barber */
-        }
-        .hovering #cursor-ring {
-            width: 50px;
-            height: 50px;
-            border-color: rgba(59, 130, 246, 0.4); /* Biru aksen barber */
-            background-color: rgba(59, 130, 246, 0.05);
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* --- BACKGROUND DOT MATRIX --- */
@@ -209,17 +218,17 @@
                     <i class="fas fa-chevron-right text-[10px] text-red-500"></i> INFORMATICS PROJECT
                 </div>
                 
-                <h1 class="text-7xl md:text-8xl lg:text-[6rem] font-black tracking-tighter leading-[0.9] mb-8 text-slate-900 reveal-on-scroll" style="transition-delay: 100ms;">
+                <h1 class="text-5xl sm:text-7xl md:text-8xl lg:text-[6rem] font-black tracking-tighter leading-[0.95] mb-6 sm:mb-8 text-slate-900 reveal-on-scroll" style="transition-delay: 100ms;">
                     TENDE<br>BARBER<span class="text-blue-600">.</span>
                 </h1>
                 
-                <div class="text-2xl md:text-3xl font-extrabold text-slate-800 mb-8 flex items-center flex-wrap h-10 reveal-on-scroll" style="transition-delay: 200ms;">
-                    <span class="mr-3">Dibuat oleh</span>
+                <div class="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-800 mb-6 sm:mb-8 flex items-center flex-wrap h-auto min-h-10 reveal-on-scroll" style="transition-delay: 200ms;">
+                    <span class="mr-2 sm:mr-3">Dibuat oleh</span>
                     <!-- Efek Ketikan -->
-                    <span class="bg-slate-900 text-white px-4 py-1.5 rounded-xl typed-text shadow-md"></span><span class="cursor-type"></span>
+                    <span class="bg-slate-900 text-white px-3 sm:px-4 py-1 sm:py-1.5 rounded-xl typed-text shadow-md text-sm sm:text-xl md:text-2xl"></span><span class="cursor-type"></span>
                 </div>
                 
-                <p class="text-slate-500 font-medium max-w-lg mb-16 text-lg leading-relaxed reveal-on-scroll" style="transition-delay: 300ms;">
+                <p class="text-slate-500 font-medium max-w-lg mb-10 sm:mb-16 text-base sm:text-lg leading-relaxed reveal-on-scroll" style="transition-delay: 300ms;">
                     Sistem Point of Sale dan Enterprise Resource Planning yang dibangun oleh Mahasiswa <strong class="text-slate-900">Universitas Tadulako</strong>, Teknik Informatika Kelas A. Didesain untuk manajemen kasir, kapster, dan owner.
                 </p>
                 
@@ -233,11 +242,11 @@
             </div>
 
             <!-- Kanan: 3D ID Card -->
-            <div class="w-full lg:w-[45%] flex justify-center items-center id-card-wrapper h-[600px] select-none z-10 relative reveal-on-scroll" style="transition-delay: 200ms;" id="card-container">
+            <div class="w-full lg:w-[45%] flex justify-center items-center id-card-wrapper h-auto min-h-[520px] sm:h-[600px] select-none z-10 relative reveal-on-scroll" style="transition-delay: 200ms;" id="card-container">
                 <!-- Aksen visual di belakang card -->
-                <div class="absolute w-80 h-80 bg-gradient-to-tr from-blue-100 to-red-50 rounded-full blur-3xl opacity-50 z-0 pointer-events-none"></div>
+                <div class="absolute w-72 sm:w-80 h-72 sm:h-80 bg-gradient-to-tr from-blue-100 to-red-50 rounded-full blur-3xl opacity-50 z-0 pointer-events-none"></div>
 
-                <div id="id-card" onclick="cycleTeamMember()" class="id-card-inner bg-white w-[340px] rounded-[2.5rem] border border-slate-200 p-6 flex flex-col relative shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] group z-10 cursor-pointer">
+                <div id="id-card" onclick="cycleTeamMember()" class="id-card-inner bg-white w-full max-w-[340px] rounded-[2.5rem] border border-slate-200 p-6 flex flex-col relative shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] group z-10 cursor-pointer">
                     
                     <!-- Lanyard Hole -->
                     <div class="w-full flex justify-center mb-6">
@@ -360,54 +369,54 @@
     <!-- ==========================================
          2. HUB MENU (APP LAYOUT)
     =========================================== -->
-    <div id="view-hub" class="view-section fixed inset-0 z-40 bg-white dot-matrix flex-col items-center justify-center hidden overflow-y-auto p-6 md:p-12">
-        <div class="my-auto w-full max-w-5xl flex flex-col items-center">
+    <div id="view-hub" class="view-section fixed inset-0 z-40 bg-white dot-matrix flex-col items-center justify-center hidden overflow-y-auto p-4 sm:p-6 md:p-12">
+        <div class="my-auto w-full max-w-5xl flex flex-col items-center py-6 sm:py-0">
             
-            <div class="text-center mb-16 reveal-on-scroll">
-                <div class="inline-block px-4 py-1.5 bg-slate-100 text-slate-600 rounded-full font-bold text-[10px] uppercase tracking-widest mb-5 border border-slate-200">Mode Operasional</div>
-                <h1 class="text-4xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">Pilih Modul</h1>
-                <p class="text-slate-500 font-medium text-lg">Sistem Informasi Manajemen Tende Barber.</p>
+            <div class="text-center mb-8 sm:mb-16 reveal-on-scroll">
+                <div class="inline-block px-3 sm:px-4 py-1 sm:py-1.5 bg-slate-100 text-slate-600 rounded-full font-bold text-[9px] sm:text-[10px] uppercase tracking-widest mb-3 sm:mb-5 border border-slate-200">Mode Operasional</div>
+                <h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 mb-2 sm:mb-4 tracking-tight">Pilih Modul</h1>
+                <p class="text-slate-500 font-medium text-sm sm:text-lg">Sistem Informasi Manajemen Tende Barber.</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 w-full">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 w-full">
                 
                 <!-- Menu Kasir -->
-                <button onclick="openMode('pembayaran')" class="btn-interactive group bg-white border-2 border-slate-200 hover:border-blue-500 rounded-[2.5rem] p-8 flex flex-col items-center text-center shadow-sm h-80 relative overflow-hidden reveal-on-scroll">
+                <button onclick="openMode('pembayaran')" class="btn-interactive group bg-white border-2 border-slate-200 hover:border-blue-500 rounded-3xl sm:rounded-[2.5rem] p-5 sm:p-8 flex flex-col items-center text-center shadow-sm min-h-[200px] sm:h-80 relative overflow-hidden reveal-on-scroll">
                     <div class="absolute inset-0 bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity z-0"></div>
-                    <div class="w-24 h-24 bg-slate-50 rounded-3xl flex items-center justify-center mb-8 group-hover:bg-blue-600 transition-all border border-slate-100 group-hover:border-blue-600 shadow-sm z-10 group-hover:scale-110">
-                        <i class="fas fa-desktop text-4xl text-slate-600 group-hover:text-white transition-colors"></i>
+                    <div class="w-16 h-16 sm:w-24 sm:h-24 bg-slate-50 rounded-2xl sm:rounded-3xl flex items-center justify-center mb-4 sm:mb-8 group-hover:bg-blue-600 transition-all border border-slate-100 group-hover:border-blue-600 shadow-sm z-10 group-hover:scale-110">
+                        <i class="fas fa-desktop text-2xl sm:text-4xl text-slate-600 group-hover:text-white transition-colors"></i>
                     </div>
-                    <h2 class="text-2xl font-black text-slate-900 mb-3 z-10 group-hover:text-blue-700 transition-colors">POS Kasir</h2>
-                    <p class="text-slate-500 font-medium text-sm px-4 z-10">Transaksi pencukuran, input diskon, dan manajemen struk pembayaran.</p>
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-900 mb-2 sm:mb-3 z-10 group-hover:text-blue-700 transition-colors">POS Kasir</h2>
+                    <p class="text-slate-500 font-medium text-xs sm:text-sm px-2 sm:px-4 z-10">Transaksi pencukuran, input diskon, dan manajemen struk pembayaran.</p>
                 </button>
 
                 <!-- Menu Kapster -->
-                <button id="btn-menu-kapster" onclick="promptOwnerAuth('kapster')" class="btn-interactive group bg-slate-900 border-2 border-slate-900 hover:border-amber-500 rounded-[2.5rem] p-8 flex flex-col items-center text-center shadow-xl shadow-slate-900/10 h-80 relative overflow-hidden reveal-on-scroll" style="transition-delay: 100ms;">
+                <button id="btn-menu-kapster" onclick="promptOwnerAuth('kapster')" class="btn-interactive group bg-slate-900 border-2 border-slate-900 hover:border-amber-500 rounded-3xl sm:rounded-[2.5rem] p-5 sm:p-8 flex flex-col items-center text-center shadow-xl shadow-slate-900/10 min-h-[200px] sm:h-80 relative overflow-hidden reveal-on-scroll" style="transition-delay: 100ms;">
                     <div class="absolute inset-0 bg-gradient-to-b from-slate-800 to-slate-900 opacity-0 group-hover:opacity-100 transition-opacity z-0"></div>
-                    <div class="absolute top-6 right-6 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/50 group-hover:bg-amber-500 group-hover:text-white transition-colors z-10"><i class="fas fa-lock text-xs"></i></div>
+                    <div class="absolute top-4 sm:top-6 right-4 sm:top-6 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/10 flex items-center justify-center text-white/50 group-hover:bg-amber-500 group-hover:text-white transition-colors z-10"><i class="fas fa-lock text-xs"></i></div>
                     
-                    <div class="w-24 h-24 bg-slate-800 rounded-3xl flex items-center justify-center mb-8 group-hover:bg-amber-500 transition-all border border-slate-700 group-hover:border-amber-500 shadow-sm z-10 group-hover:scale-110">
-                        <i class="fas fa-users text-4xl text-slate-300 group-hover:text-white transition-colors"></i>
+                    <div class="w-16 h-16 sm:w-24 sm:h-24 bg-slate-800 rounded-2xl sm:rounded-3xl flex items-center justify-center mb-4 sm:mb-8 group-hover:bg-amber-500 transition-all border border-slate-700 group-hover:border-amber-500 shadow-sm z-10 group-hover:scale-110">
+                        <i class="fas fa-users text-2xl sm:text-4xl text-slate-300 group-hover:text-white transition-colors"></i>
                     </div>
-                    <h2 class="text-2xl font-black text-white mb-3 z-10 group-hover:text-amber-400 transition-colors">Kapster Data</h2>
-                    <p class="text-slate-400 font-medium text-sm px-4 z-10">Pantau performa harian dan kalkulasi komisi otomatis kapster.</p>
+                    <h2 class="text-xl sm:text-2xl font-black text-white mb-2 sm:mb-3 z-10 group-hover:text-amber-400 transition-colors">Kapster Data</h2>
+                    <p class="text-slate-400 font-medium text-xs sm:text-sm px-2 sm:px-4 z-10">Pantau performa harian dan kalkulasi komisi otomatis kapster.</p>
                 </button>
 
                 <!-- Menu Owner -->
-                <button id="btn-menu-riwayat" onclick="promptOwnerAuth('riwayat')" class="btn-interactive group bg-slate-900 border-2 border-slate-900 hover:border-red-500 rounded-[2.5rem] p-8 flex flex-col items-center text-center shadow-xl shadow-slate-900/10 h-80 relative overflow-hidden reveal-on-scroll" style="transition-delay: 200ms;">
+                <button id="btn-menu-riwayat" onclick="promptOwnerAuth('riwayat')" class="btn-interactive group bg-slate-900 border-2 border-slate-900 hover:border-red-500 rounded-3xl sm:rounded-[2.5rem] p-5 sm:p-8 flex flex-col items-center text-center shadow-xl shadow-slate-900/10 min-h-[200px] sm:h-80 relative overflow-hidden reveal-on-scroll" style="transition-delay: 200ms;">
                     <div class="absolute inset-0 bg-gradient-to-b from-slate-800 to-slate-900 opacity-0 group-hover:opacity-100 transition-opacity z-0"></div>
-                    <div class="absolute top-6 right-6 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/50 group-hover:bg-red-500 group-hover:text-white transition-colors z-10"><i class="fas fa-lock text-xs"></i></div>
+                    <div class="absolute top-4 sm:top-6 right-4 sm:top-6 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/10 flex items-center justify-center text-white/50 group-hover:bg-red-500 group-hover:text-white transition-colors z-10"><i class="fas fa-lock text-xs"></i></div>
                     
-                    <div class="w-24 h-24 bg-slate-800 rounded-3xl flex items-center justify-center mb-8 group-hover:bg-red-500 transition-all border border-slate-700 group-hover:border-red-500 shadow-sm z-10 group-hover:scale-110">
-                        <i class="fas fa-chart-pie text-4xl text-slate-300 group-hover:text-white transition-colors"></i>
+                    <div class="w-16 h-16 sm:w-24 sm:h-24 bg-slate-800 rounded-2xl sm:rounded-3xl flex items-center justify-center mb-4 sm:mb-8 group-hover:bg-red-500 transition-all border border-slate-700 group-hover:border-red-500 shadow-sm z-10 group-hover:scale-110">
+                        <i class="fas fa-chart-pie text-2xl sm:text-4xl text-slate-300 group-hover:text-white transition-colors"></i>
                     </div>
-                    <h2 class="text-2xl font-black text-white mb-3 z-10 group-hover:text-red-400 transition-colors">Owner Report</h2>
-                    <p class="text-slate-400 font-medium text-sm px-4 z-10">Laporan keuangan bulanan, omset bersih, dan riwayat transaksi.</p>
+                    <h2 class="text-xl sm:text-2xl font-black text-white mb-2 sm:mb-3 z-10 group-hover:text-red-400 transition-colors">Owner Report</h2>
+                    <p class="text-slate-400 font-medium text-xs sm:text-sm px-2 sm:px-4 z-10">Laporan keuangan bulanan, omset bersih, dan riwayat transaksi.</p>
                 </button>
                 
             </div>
             
-            <button onclick="logout()" class="btn-interactive mt-16 px-8 py-3.5 bg-white border-2 border-slate-200 rounded-full text-slate-600 font-black hover:text-red-600 hover:border-red-200 hover:bg-red-50 flex items-center shadow-sm text-sm transition-colors relative z-10 reveal-on-scroll">
+            <button onclick="logout()" class="btn-interactive mt-8 sm:mt-16 px-6 sm:px-8 py-3 sm:py-3.5 bg-white border-2 border-slate-200 rounded-full text-slate-600 font-black hover:text-red-600 hover:border-red-200 hover:bg-red-50 flex items-center shadow-sm text-xs sm:text-sm transition-colors relative z-10 reveal-on-scroll">
                 <i class="fas fa-power-off mr-2"></i> Kunci Sesi
             </button>
         </div>
@@ -417,19 +426,19 @@
     <!-- ==========================================
          3. MAIN APP LAYOUT (KASIR/KAPSTER/OWNER)
     =========================================== -->
-    <div id="app-layout" class="hidden w-full h-screen flex flex-col bg-[#f8fafc] fixed inset-0 z-30">
+    <div id="app-layout" class="hidden w-full h-[100dvh] min-h-[100dvh] flex flex-col bg-[#f8fafc] fixed inset-0 z-30 overflow-hidden">
         
         <!-- Header App -->
-        <header class="bg-white border-b border-slate-200 flex items-center justify-between px-6 h-20 shrink-0 z-30 shadow-sm">
-            <div class="flex items-center gap-4">
-                <button onclick="showHub()" class="btn-interactive w-10 h-10 flex items-center justify-center bg-slate-50 border border-slate-200 hover:border-slate-900 rounded-xl transition-colors text-slate-700 group">
-                    <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform"></i> 
+        <header class="bg-white border-b border-slate-200 flex items-center justify-between px-3 sm:px-6 h-16 sm:h-20 shrink-0 z-30 shadow-sm">
+            <div class="flex items-center gap-2 sm:gap-4">
+                <button onclick="showHub()" class="btn-interactive w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-slate-50 border border-slate-200 hover:border-slate-900 rounded-xl transition-colors text-slate-700 group">
+                    <i class="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform text-sm sm:text-base"></i> 
                 </button>
-                <div class="h-6 w-px bg-slate-200 mx-2 hidden sm:block"></div>
-                <h1 id="page-title" class="text-xl font-black text-slate-900 tracking-tight hidden sm:block">Dashboard</h1>
+                <div class="h-6 w-px bg-slate-200 mx-1 sm:mx-2 hidden sm:block"></div>
+                <h1 id="page-title" class="text-base sm:text-xl font-black text-slate-900 tracking-tight">Dashboard</h1>
             </div>
             
-            <div class="flex items-center gap-5">
+            <div class="flex items-center gap-2 sm:gap-5">
                 <div class="hidden lg:flex items-center gap-2 cursor-default">
                     <div class="w-1.5 h-6 barber-pole rounded-full shadow-sm border border-slate-200"></div>
                     <div class="font-black text-lg tracking-tighter text-slate-900">
@@ -438,21 +447,21 @@
                 </div>
 
                 <!-- Global Date Picker -->
-                <div id="date-picker-container" class="relative bg-white border-2 border-slate-200 hover:border-blue-500 rounded-xl px-4 py-2 flex items-center transition-colors cursor-pointer shadow-sm group">
-                    <i class="fas fa-calendar-day text-slate-400 group-hover:text-blue-600 mr-3 transition-colors"></i>
+                <div id="date-picker-container" class="relative bg-white border-2 border-slate-200 hover:border-blue-500 rounded-xl px-2.5 py-1.5 sm:px-4 sm:py-2 flex items-center transition-colors cursor-pointer shadow-sm group">
+                    <i class="fas fa-calendar-day text-slate-400 group-hover:text-blue-600 mr-2 sm:mr-3 text-xs sm:text-sm transition-colors"></i>
                     <div class="flex flex-col">
-                        <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1 group-hover:text-blue-500 transition-colors">Tanggal Transaksi</span>
-                        <span id="display-date" class="text-xs font-bold text-slate-900 leading-none">Pilih</span>
+                        <span class="text-[7px] sm:text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5 sm:mb-1 group-hover:text-blue-500 transition-colors">Tanggal Transaksi</span>
+                        <span id="display-date" class="text-[11px] sm:text-xs font-bold text-slate-900 leading-none">Pilih</span>
                     </div>
                     <input type="date" id="global-date" onchange="handleDateChange()" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
                 </div>
 
                 <!-- Global Month Picker -->
-                <div id="month-picker-container" class="relative bg-white border-2 border-slate-200 hover:border-red-500 rounded-xl px-4 py-2 items-center transition-colors cursor-pointer shadow-sm group hidden">
-                    <i class="fas fa-calendar-alt text-slate-400 group-hover:text-red-500 mr-3 transition-colors"></i>
+                <div id="month-picker-container" class="relative bg-white border-2 border-slate-200 hover:border-red-500 rounded-xl px-2.5 py-1.5 sm:px-4 sm:py-2 items-center transition-colors cursor-pointer shadow-sm group hidden">
+                    <i class="fas fa-calendar-alt text-slate-400 group-hover:text-red-500 mr-2 sm:mr-3 text-xs sm:text-sm transition-colors"></i>
                     <div class="flex flex-col">
-                        <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1 group-hover:text-red-400 transition-colors">Bulan Laporan</span>
-                        <span id="display-month" class="text-xs font-bold text-slate-900 leading-none">Pilih</span>
+                        <span class="text-[7px] sm:text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5 sm:mb-1 group-hover:text-red-400 transition-colors">Bulan Laporan</span>
+                        <span id="display-month" class="text-[11px] sm:text-xs font-bold text-slate-900 leading-none">Pilih</span>
                     </div>
                     <input type="month" id="global-month" onchange="handleMonthChange()" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
                 </div>
@@ -460,94 +469,94 @@
         </header>
 
         <!-- Main Content Area -->
-        <main class="flex-1 overflow-y-auto w-full p-4 md:p-8 relative scroll-smooth bg-slate-50/50 dot-matrix">
+        <main class="flex-1 overflow-y-auto w-full p-3 sm:p-6 md:p-8 relative scroll-smooth bg-slate-50/50 dot-matrix">
             
             <!-- ================= VIEW: KASIR ================= -->
             <div id="view-pembayaran" class="view-section flex-col hidden max-w-[1400px] mx-auto w-full">
-                <div class="flex flex-col xl:flex-row gap-8 items-start">
+                <div class="flex flex-col xl:flex-row gap-6 sm:gap-8 items-start">
                     
                     <!-- Kiri: Pilihan -->
-                    <div class="w-full xl:flex-1 flex flex-col gap-8">
+                    <div class="w-full xl:flex-1 flex flex-col gap-6 sm:gap-8">
                         <!-- Step 1: Kapster -->
-                        <section class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-md transition-shadow reveal-on-scroll">
-                            <h2 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-3">
+                        <section class="bg-white p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-md transition-shadow reveal-on-scroll">
+                            <h2 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-4 sm:mb-6 flex items-center gap-3">
                                 <span class="bg-blue-50 text-blue-600 w-7 h-7 rounded-full flex items-center justify-center text-xs border border-blue-100 shadow-sm">1</span> 
                                 Pilih Kapster
                             </h2>
-                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="kapster-selection">
-                                <div onclick="selectKapster('KP001', 'Faqih')" id="sel-kapster-KP001" class="btn-interactive interactive-element cursor-pointer bg-white border-2 border-slate-200 rounded-3xl p-4 flex flex-col items-center hover:border-blue-500 transition-all select-none group shadow-sm">
-                                    <div id="avatar-KP001" class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center font-black text-2xl mb-3 transition-colors shadow-sm group-hover:text-blue-600 group-hover:border-blue-200 group-hover:bg-blue-50">
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4" id="kapster-selection">
+                                <div onclick="selectKapster('KP001', 'Faqih')" id="sel-kapster-KP001" class="btn-interactive interactive-element cursor-pointer bg-white border-2 border-slate-200 rounded-2xl sm:rounded-3xl p-3 sm:p-4 flex flex-col items-center hover:border-blue-500 transition-all select-none group shadow-sm">
+                                    <div id="avatar-KP001" class="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center font-black text-lg sm:text-2xl mb-2 sm:mb-3 transition-colors shadow-sm group-hover:text-blue-600 group-hover:border-blue-200 group-hover:bg-blue-50">
                                         F
                                     </div>
-                                    <span class="font-black text-slate-700 text-xs uppercase tracking-widest group-hover:text-blue-700 transition-colors">Faqih</span>
+                                    <span class="font-black text-slate-700 text-[11px] sm:text-xs uppercase tracking-widest group-hover:text-blue-700 transition-colors text-center truncate max-w-full">Faqih</span>
                                 </div>
-                                <div onclick="selectKapster('KP002', 'Budi')" id="sel-kapster-KP002" class="btn-interactive interactive-element cursor-pointer bg-white border-2 border-slate-200 rounded-3xl p-4 flex flex-col items-center hover:border-blue-500 transition-all select-none group shadow-sm">
-                                    <div id="avatar-KP002" class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center font-black text-2xl mb-3 transition-colors shadow-sm group-hover:text-blue-600 group-hover:border-blue-200 group-hover:bg-blue-50">
+                                <div onclick="selectKapster('KP002', 'Budi')" id="sel-kapster-KP002" class="btn-interactive interactive-element cursor-pointer bg-white border-2 border-slate-200 rounded-2xl sm:rounded-3xl p-3 sm:p-4 flex flex-col items-center hover:border-blue-500 transition-all select-none group shadow-sm">
+                                    <div id="avatar-KP002" class="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center font-black text-lg sm:text-2xl mb-2 sm:mb-3 transition-colors shadow-sm group-hover:text-blue-600 group-hover:border-blue-200 group-hover:bg-blue-50">
                                         B
                                     </div>
-                                    <span class="font-black text-slate-700 text-xs uppercase tracking-widest group-hover:text-blue-700 transition-colors">Budi</span>
+                                    <span class="font-black text-slate-700 text-[11px] sm:text-xs uppercase tracking-widest group-hover:text-blue-700 transition-colors text-center truncate max-w-full">Budi</span>
                                 </div>
-                                <div onclick="selectKapster('KP003', 'Rian')" id="sel-kapster-KP003" class="btn-interactive interactive-element cursor-pointer bg-white border-2 border-slate-200 rounded-3xl p-4 flex flex-col items-center hover:border-blue-500 transition-all select-none group shadow-sm">
-                                    <div id="avatar-KP003" class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center font-black text-2xl mb-3 transition-colors shadow-sm group-hover:text-blue-600 group-hover:border-blue-200 group-hover:bg-blue-50">
+                                <div onclick="selectKapster('KP003', 'Rian')" id="sel-kapster-KP003" class="btn-interactive interactive-element cursor-pointer bg-white border-2 border-slate-200 rounded-2xl sm:rounded-3xl p-3 sm:p-4 flex flex-col items-center hover:border-blue-500 transition-all select-none group shadow-sm">
+                                    <div id="avatar-KP003" class="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center font-black text-lg sm:text-2xl mb-2 sm:mb-3 transition-colors shadow-sm group-hover:text-blue-600 group-hover:border-blue-200 group-hover:bg-blue-50">
                                         R
                                     </div>
-                                    <span class="font-black text-slate-700 text-xs uppercase tracking-widest group-hover:text-blue-700 transition-colors">Rian</span>
+                                    <span class="font-black text-slate-700 text-[11px] sm:text-xs uppercase tracking-widest group-hover:text-blue-700 transition-colors text-center truncate max-w-full">Rian</span>
                                 </div>
-                                <div onclick="selectKapster('KP004', 'Arif')" id="sel-kapster-KP004" class="btn-interactive interactive-element cursor-pointer bg-white border-2 border-slate-200 rounded-3xl p-4 flex flex-col items-center hover:border-blue-500 transition-all select-none group shadow-sm">
-                                    <div id="avatar-KP004" class="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center font-black text-2xl mb-3 transition-colors shadow-sm group-hover:text-blue-600 group-hover:border-blue-200 group-hover:bg-blue-50">
+                                <div onclick="selectKapster('KP004', 'Arif')" id="sel-kapster-KP004" class="btn-interactive interactive-element cursor-pointer bg-white border-2 border-slate-200 rounded-2xl sm:rounded-3xl p-3 sm:p-4 flex flex-col items-center hover:border-blue-500 transition-all select-none group shadow-sm">
+                                    <div id="avatar-KP004" class="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-slate-50 border border-slate-200 text-slate-400 flex items-center justify-center font-black text-lg sm:text-2xl mb-2 sm:mb-3 transition-colors shadow-sm group-hover:text-blue-600 group-hover:border-blue-200 group-hover:bg-blue-50">
                                         A
                                     </div>
-                                    <span class="font-black text-slate-700 text-xs uppercase tracking-widest group-hover:text-blue-700 transition-colors">Arif</span>
+                                    <span class="font-black text-slate-700 text-[11px] sm:text-xs uppercase tracking-widest group-hover:text-blue-700 transition-colors text-center truncate max-w-full">Arif</span>
                                 </div>
                             </div>
                         </section>
 
                         <!-- Step 2: Layanan -->
-                        <section class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-md transition-shadow reveal-on-scroll">
-                            <h2 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-3">
+                        <section class="bg-white p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-md transition-shadow reveal-on-scroll">
+                            <h2 class="text-xs font-black text-slate-500 uppercase tracking-widest mb-4 sm:mb-6 flex items-center gap-3">
                                 <span class="bg-blue-50 text-blue-600 w-7 h-7 rounded-full flex items-center justify-center text-xs border border-blue-100 shadow-sm">2</span> 
                                 Pilih Layanan
                             </h2>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                <div onclick="selectService('standar', 40000)" id="card-standar" class="btn-interactive cursor-pointer bg-white border-2 border-slate-200 rounded-[2rem] p-6 hover:border-blue-500 hover:bg-blue-50/30 relative group flex flex-col items-start justify-center">
-                                    <div class="w-14 h-14 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-center text-2xl mb-4 text-slate-400 group-hover:text-blue-600 group-hover:border-blue-200 group-hover:bg-blue-100 transition-colors shadow-sm">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5">
+                                <div onclick="selectService('standar', 40000)" id="card-standar" class="btn-interactive cursor-pointer bg-white border-2 border-slate-200 rounded-2xl sm:rounded-[2rem] p-4 sm:p-6 hover:border-blue-500 hover:bg-blue-50/30 relative group flex flex-col items-start justify-center">
+                                    <div class="w-11 h-11 sm:w-14 sm:h-14 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-center text-xl sm:text-2xl mb-3 sm:mb-4 text-slate-400 group-hover:text-blue-600 group-hover:border-blue-200 group-hover:bg-blue-100 transition-colors shadow-sm">
                                         <i class="fas fa-cut"></i>
                                     </div>
-                                    <h3 class="text-xl font-black text-slate-900 mb-1 group-hover:text-blue-700 transition-colors">Cukur Standar</h3>
-                                    <p class="text-2xl font-black text-slate-500 group-hover:text-blue-600 transition-colors">Rp 40.000</p>
-                                    <div class="check-icon hidden absolute top-6 right-6 text-blue-600 text-2xl"><i class="fas fa-check-circle"></i></div>
+                                    <h3 class="text-lg sm:text-xl font-black text-slate-900 mb-1 group-hover:text-blue-700 transition-colors">Cukur Standar</h3>
+                                    <p class="text-xl sm:text-2xl font-black text-slate-500 group-hover:text-blue-600 transition-colors">Rp 40.000</p>
+                                    <div class="check-icon hidden absolute top-4 sm:top-6 right-4 sm:right-6 text-blue-600 text-xl sm:text-2xl"><i class="fas fa-check-circle"></i></div>
                                 </div>
 
-                                <div onclick="selectService('premium', 50000)" id="card-premium" class="btn-interactive cursor-pointer bg-white border-2 border-slate-200 rounded-[2rem] p-6 hover:border-red-500 hover:bg-red-50/30 relative group flex flex-col items-start justify-center">
-                                    <div class="w-14 h-14 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-center text-2xl mb-4 text-slate-400 group-hover:text-red-500 group-hover:border-red-200 group-hover:bg-red-100 transition-colors shadow-sm">
+                                <div onclick="selectService('premium', 50000)" id="card-premium" class="btn-interactive cursor-pointer bg-white border-2 border-slate-200 rounded-2xl sm:rounded-[2rem] p-4 sm:p-6 hover:border-red-500 hover:bg-red-50/30 relative group flex flex-col items-start justify-center">
+                                    <div class="w-11 h-11 sm:w-14 sm:h-14 bg-slate-50 rounded-2xl border border-slate-200 flex items-center justify-center text-xl sm:text-2xl mb-3 sm:mb-4 text-slate-400 group-hover:text-red-500 group-hover:border-red-200 group-hover:bg-red-100 transition-colors shadow-sm">
                                         <i class="fas fa-crown"></i>
                                     </div>
-                                    <h3 class="text-xl font-black text-slate-900 mb-1 group-hover:text-red-600 transition-colors">Cukur Premium</h3>
-                                    <p class="text-2xl font-black text-slate-500 group-hover:text-red-500 transition-colors">Rp 50.000</p>
-                                    <div class="check-icon hidden absolute top-6 right-6 text-red-500 text-2xl"><i class="fas fa-check-circle"></i></div>
+                                    <h3 class="text-lg sm:text-xl font-black text-slate-900 mb-1 group-hover:text-red-600 transition-colors">Cukur Premium</h3>
+                                    <p class="text-xl sm:text-2xl font-black text-slate-500 group-hover:text-red-500 transition-colors">Rp 50.000</p>
+                                    <div class="check-icon hidden absolute top-4 sm:top-6 right-4 sm:right-6 text-red-500 text-xl sm:text-2xl"><i class="fas fa-check-circle"></i></div>
                                 </div>
                             </div>
                         </section>
                     </div>
 
                     <!-- Kanan: Struk -->
-                    <div class="w-full xl:w-[420px] shrink-0 bg-white rounded-[2.5rem] border border-slate-200 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] flex flex-col overflow-hidden self-start xl:sticky xl:top-8 group hover:border-slate-300 transition-colors reveal-on-scroll barber-accent-border">
+                    <div class="w-full xl:w-[420px] shrink-0 bg-white rounded-2xl sm:rounded-[2.5rem] border border-slate-200 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] flex flex-col overflow-hidden self-start xl:sticky xl:top-8 group hover:border-slate-300 transition-colors reveal-on-scroll barber-accent-border">
                         
-                        <div class="bg-slate-900 text-white p-7 flex justify-between items-center relative overflow-hidden">
+                        <div class="bg-slate-900 text-white p-5 sm:p-7 flex justify-between items-center relative overflow-hidden">
                             <div class="absolute -right-4 -top-4 opacity-10 text-6xl transform rotate-12"><i class="fas fa-receipt"></i></div>
                             <div class="relative z-10">
-                                <h2 class="font-black text-xl tracking-wide uppercase">Tagihan</h2>
+                                <h2 class="font-black text-lg sm:text-xl tracking-wide uppercase">Tagihan</h2>
                                 <p class="text-xs font-bold text-slate-400 mt-1 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span> Order #<span id="queue-number">01</span></p>
                             </div>
-                            <div class="relative z-10 text-xs font-bold bg-white/10 border border-white/20 px-3 py-1.5 rounded-lg flex items-center shadow-sm">
+                            <div class="relative z-10 text-xs font-bold bg-white/10 border border-white/20 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg flex items-center shadow-sm">
                                 <i class="far fa-clock mr-1.5"></i> <span id="real-time-clock">00:00</span>
                             </div>
                         </div>
 
-                        <div class="p-7 flex-1 flex flex-col space-y-7 bg-slate-50/50">
+                        <div class="p-4 sm:p-7 flex-1 flex flex-col space-y-5 sm:space-y-7 bg-slate-50/50">
                             
                             <!-- Rincian -->
-                            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                            <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
                                 <div class="flex justify-between items-center text-sm">
                                     <span class="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Kapster</span>
                                     <span id="ticket-kapster" class="font-black text-slate-900 bg-slate-50 px-2.5 py-1 rounded border border-slate-100">-</span>
@@ -568,7 +577,7 @@
                                         oninput="cleanInput(this); calculateTotal();" 
                                         onfocus="if(this.value==='0') this.value=''"
                                         onblur="if(this.value==='') this.value='0'"
-                                        class="w-full text-right bg-white border-2 border-slate-200 rounded-xl pl-12 pr-4 py-3 font-black text-slate-900 focus:border-blue-500 focus:ring-0 outline-none transition-colors text-lg shadow-sm">
+                                        class="w-full text-right bg-white border-2 border-slate-200 rounded-xl pl-12 pr-4 py-2.5 sm:py-3 font-black text-slate-900 focus:border-blue-500 focus:ring-0 outline-none transition-colors text-base sm:text-lg shadow-sm">
                                 </div>
                             </div>
 
@@ -576,50 +585,50 @@
                             <div class="space-y-2">
                                 <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-1">Metode Bayar</label>
                                 <div class="grid grid-cols-2 gap-3">
-                                    <button onclick="selectPaymentMethod('cash')" id="btn-pay-cash" class="btn-interactive interactive-element py-3.5 bg-white border-2 border-slate-200 rounded-xl font-bold text-sm text-slate-500 flex items-center justify-center gap-2 hover:border-green-500 hover:text-green-600 hover:bg-green-50/30 transition-colors shadow-sm">
+                                    <button onclick="selectPaymentMethod('cash')" id="btn-pay-cash" class="btn-interactive interactive-element py-3 sm:py-3.5 bg-white border-2 border-slate-200 rounded-xl font-bold text-xs sm:text-sm text-slate-500 flex items-center justify-center gap-1.5 sm:gap-2 hover:border-green-500 hover:text-green-600 hover:bg-green-50/30 transition-colors shadow-sm">
                                         <i class="fas fa-money-bill-wave"></i> CASH
                                     </button>
-                                    <button onclick="selectPaymentMethod('qris')" id="btn-pay-qris" class="btn-interactive interactive-element py-3.5 bg-white border-2 border-slate-200 rounded-xl font-bold text-sm text-slate-500 flex items-center justify-center gap-2 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/30 transition-colors shadow-sm">
+                                    <button onclick="selectPaymentMethod('qris')" id="btn-pay-qris" class="btn-interactive interactive-element py-3 sm:py-3.5 bg-white border-2 border-slate-200 rounded-xl font-bold text-xs sm:text-sm text-slate-500 flex items-center justify-center gap-1.5 sm:gap-2 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50/30 transition-colors shadow-sm">
                                         <i class="fas fa-qrcode"></i> QRIS
                                     </button>
                                 </div>
                             </div>
 
                             <!-- Panel Cash Detail -->
-                            <div id="payment-details" class="hidden flex-col bg-white p-5 rounded-2xl border-2 border-green-200 shadow-sm space-y-4">
+                            <div id="payment-details" class="hidden flex-col bg-white p-4 sm:p-5 rounded-2xl border-2 border-green-200 shadow-sm space-y-4">
                                 <div class="space-y-2">
                                     <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest flex justify-between items-center">
                                         <span>Uang Diterima</span>
                                         <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[8px]">Auto</span>
                                     </label>
                                     <div class="relative flex items-center">
-                                        <span class="absolute left-4 font-black text-green-600 text-xl">Rp</span>
+                                        <span class="absolute left-4 font-black text-green-600 text-lg sm:text-xl">Rp</span>
                                         <input type="number" id="input-uang" value="0"
                                             oninput="cleanInput(this); calculateKembalian();" 
                                             onfocus="if(this.value==='0') this.value=''"
                                             onblur="if(this.value==='') this.value='0'"
-                                            class="w-full text-right bg-green-50 border border-green-200 rounded-xl pl-12 pr-4 py-3 font-black text-green-700 focus:border-green-500 focus:ring-0 outline-none text-2xl shadow-inner transition-colors">
+                                            class="w-full text-right bg-green-50 border border-green-200 rounded-xl pl-12 pr-4 py-2.5 sm:py-3 font-black text-green-700 focus:border-green-500 focus:ring-0 outline-none text-xl sm:text-2xl shadow-inner transition-colors">
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-3 gap-2">
-                                    <button onclick="setFastCash('uang_pas')" class="btn-interactive bg-white border border-slate-200 text-slate-600 py-2 rounded-lg text-xs font-bold hover:border-green-400 hover:bg-green-50 hover:text-green-700 transition-colors shadow-sm">PAS</button>
-                                    <button onclick="setFastCash(50000)" class="btn-interactive bg-white border border-slate-200 text-slate-600 py-2 rounded-lg text-xs font-bold hover:border-green-400 hover:bg-green-50 hover:text-green-700 transition-colors shadow-sm">50k</button>
-                                    <button onclick="setFastCash(100000)" class="btn-interactive bg-white border border-slate-200 text-slate-600 py-2 rounded-lg text-xs font-bold hover:border-green-400 hover:bg-green-50 hover:text-green-700 transition-colors shadow-sm">100k</button>
+                                    <button onclick="setFastCash('uang_pas')" class="btn-interactive bg-white border border-slate-200 text-slate-600 py-2 rounded-lg text-[11px] sm:text-xs font-bold hover:border-green-400 hover:bg-green-50 hover:text-green-700 transition-colors shadow-sm">PAS</button>
+                                    <button onclick="setFastCash(50000)" class="btn-interactive bg-white border border-slate-200 text-slate-600 py-2 rounded-lg text-[11px] sm:text-xs font-bold hover:border-green-400 hover:bg-green-50 hover:text-green-700 transition-colors shadow-sm">50k</button>
+                                    <button onclick="setFastCash(100000)" class="btn-interactive bg-white border border-slate-200 text-slate-600 py-2 rounded-lg text-[11px] sm:text-xs font-bold hover:border-green-400 hover:bg-green-50 hover:text-green-700 transition-colors shadow-sm">100k</button>
                                 </div>
-                                <div class="flex justify-between items-center pt-4 border-t border-slate-100 mt-2">
+                                <div class="flex justify-between items-center pt-3 sm:pt-4 border-t border-slate-100 mt-2">
                                     <span class="text-slate-500 font-bold text-xs uppercase tracking-widest">Kembalian</span>
-                                    <span id="ticket-kembalian" class="font-black text-green-500 text-2xl">Rp 0</span>
+                                    <span id="ticket-kembalian" class="font-black text-green-500 text-xl sm:text-2xl">Rp 0</span>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Pay Action -->
-                        <div class="p-7 bg-white border-t border-slate-200 space-y-5 rounded-b-[2.5rem]">
+                        <div class="p-4 sm:p-7 bg-white border-t border-slate-200 space-y-4 sm:space-y-5 rounded-b-2xl sm:rounded-b-[2.5rem]">
                             <div class="flex justify-between items-end">
                                 <span class="text-slate-400 font-black text-[10px] uppercase tracking-widest mb-1">Total Bayar</span>
-                                <span id="ticket-total" class="text-4xl font-black text-slate-900 tracking-tighter">Rp 0</span>
+                                <span id="ticket-total" class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tighter">Rp 0</span>
                             </div>
-                            <button onclick="processPayment()" class="btn-interactive interactive-element w-full py-4 bg-slate-900 hover:bg-blue-600 text-white rounded-xl font-black text-lg flex items-center justify-center gap-2 shadow-lg shadow-slate-900/20 hover:shadow-blue-600/30 transition-all border border-transparent hover:border-blue-400">
+                            <button onclick="processPayment()" class="btn-interactive interactive-element w-full py-3.5 sm:py-4 bg-slate-900 hover:bg-blue-600 text-white rounded-xl font-black text-base sm:text-lg flex items-center justify-center gap-2 shadow-lg shadow-slate-900/20 hover:shadow-blue-600/30 transition-all border border-transparent hover:border-blue-400">
                                 <span>PROSES BAYAR</span> <i class="fas fa-check-circle"></i>
                             </button>
                         </div>
@@ -629,18 +638,18 @@
 
             <!-- ================= VIEW: KAPSTER (PRIVATE) ================= -->
             <div id="view-kapster" class="view-section flex-col hidden max-w-6xl mx-auto w-full">
-                <div class="flex flex-col space-y-8">
+                <div class="flex flex-col space-y-6 sm:space-y-8">
                     
-                    <div class="bg-slate-900 rounded-[2.5rem] p-8 md:p-10 text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl relative overflow-hidden reveal-on-scroll barber-accent-border">
+                    <div class="bg-slate-900 rounded-3xl sm:rounded-[2.5rem] p-6 sm:p-8 md:p-10 text-white flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-xl relative overflow-hidden reveal-on-scroll barber-accent-border">
                         <div class="absolute -right-10 -bottom-10 text-white/5 text-9xl transform rotate-12 pointer-events-none"><i class="fas fa-users"></i></div>
                         <div class="relative z-10">
-                            <div class="inline-flex items-center px-3 py-1 bg-white/10 rounded-full font-bold text-[10px] uppercase tracking-widest mb-4 border border-white/20"><i class="fas fa-lock mr-2 text-amber-400"></i> Owner Access Only</div>
-                            <h3 class="font-black text-3xl md:text-4xl mb-3 tracking-tight">Performa Kapster</h3>
-                            <p class="text-slate-400 text-sm max-w-xl leading-relaxed">Data jumlah pelanggan selesai per hari berdasarkan tanggal yang dipilih. Komisi harian otomatis dikalkulasi 5%.</p>
+                            <div class="inline-flex items-center px-3 py-1 bg-white/10 rounded-full font-bold text-[10px] uppercase tracking-widest mb-3 sm:mb-4 border border-white/20"><i class="fas fa-lock mr-2 text-amber-400"></i> Owner Access Only</div>
+                            <h3 class="font-black text-2xl sm:text-3xl md:text-4xl mb-2 sm:mb-3 tracking-tight">Performa Kapster</h3>
+                            <p class="text-slate-400 text-xs sm:text-sm max-w-xl leading-relaxed">Data jumlah pelanggan selesai per hari berdasarkan tanggal yang dipilih. Komisi harian otomatis dikalkulasi 5%.</p>
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="kapster-dashboard">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6" id="kapster-dashboard">
                         <!-- Rendered via JS -->
                     </div>
                 </div>
@@ -648,57 +657,57 @@
 
             <!-- ================= VIEW: RIWAYAT (OWNER) ================= -->
             <div id="view-riwayat" class="view-section flex-col hidden max-w-7xl mx-auto w-full">
-                <div class="flex flex-col space-y-8">
+                <div class="flex flex-col space-y-6 sm:space-y-8">
                     
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-center relative overflow-hidden reveal-on-scroll">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+                        <div class="bg-white p-5 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-center relative overflow-hidden reveal-on-scroll">
                             <div class="absolute -right-4 -bottom-4 text-slate-50 text-7xl"><i class="fas fa-wallet"></i></div>
                             <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2 relative z-10"><i class="fas fa-wallet text-blue-500"></i> Total Omset Bulan Ini</h3>
-                            <p id="riwayat-omset" class="text-4xl font-black text-slate-900 tracking-tighter relative z-10">Rp 0</p>
+                            <p id="riwayat-omset" class="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 tracking-tighter relative z-10">Rp 0</p>
                         </div>
-                        <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-center relative overflow-hidden reveal-on-scroll" style="transition-delay: 100ms;">
+                        <div class="bg-white p-5 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-col justify-center relative overflow-hidden reveal-on-scroll" style="transition-delay: 100ms;">
                             <div class="absolute -right-4 -bottom-4 text-slate-50 text-7xl"><i class="fas fa-hand-holding-usd"></i></div>
                             <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2 relative z-10"><i class="fas fa-hand-holding-usd text-red-500"></i> Estimasi Gaji/Komisi</h3>
-                            <p id="riwayat-pengeluaran" class="text-4xl font-black text-slate-500 tracking-tighter relative z-10">Rp 0</p>
+                            <p id="riwayat-pengeluaran" class="text-2xl sm:text-3xl md:text-4xl font-black text-slate-500 tracking-tighter relative z-10">Rp 0</p>
                         </div>
-                        <div class="bg-slate-900 p-8 rounded-[2.5rem] border border-slate-900 text-white shadow-xl shadow-slate-900/20 flex flex-col justify-center relative overflow-hidden reveal-on-scroll barber-accent-border" style="transition-delay: 200ms;">
+                        <div class="bg-slate-900 p-5 sm:p-8 rounded-3xl sm:rounded-[2.5rem] border border-slate-900 text-white shadow-xl shadow-slate-900/20 flex flex-col justify-center relative overflow-hidden reveal-on-scroll barber-accent-border" style="transition-delay: 200ms;">
                             <div class="absolute -right-4 -bottom-4 text-white/10 text-7xl"><i class="fas fa-chart-line"></i></div>
                             <div class="relative z-10">
                                 <h3 class="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-2 flex items-center gap-2"><i class="fas fa-piggy-bank text-green-400"></i> Pendapatan Bersih (Net)</h3>
-                                <p id="riwayat-net" class="text-4xl font-black tracking-tighter text-white">Rp 0</p>
+                                <p id="riwayat-net" class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tighter text-white">Rp 0</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
                         <!-- Rekap Gaji Bulanan -->
-                        <div class="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col overflow-hidden reveal-on-scroll">
-                            <div class="p-6 md:p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                                <h2 class="font-black text-xl text-slate-900 tracking-tight flex items-center"><i class="fas fa-users text-blue-500 mr-3"></i> Rekap Gaji Kapster</h2>
-                                <span class="bg-white border border-slate-200 text-slate-600 text-[10px] font-bold px-3 py-1.5 rounded-lg uppercase tracking-widest shadow-sm">Bulan Terpilih</span>
+                        <div class="bg-white rounded-3xl sm:rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col overflow-hidden reveal-on-scroll">
+                            <div class="p-5 sm:p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                                <h2 class="font-black text-lg sm:text-xl text-slate-900 tracking-tight flex items-center"><i class="fas fa-users text-blue-500 mr-2 sm:mr-3"></i> Rekap Gaji Kapster</h2>
+                                <span class="bg-white border border-slate-200 text-slate-600 text-[9px] sm:text-[10px] font-bold px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg uppercase tracking-widest shadow-sm">Bulan Terpilih</span>
                             </div>
-                            <div class="p-6 md:p-8 flex-1 overflow-y-auto max-h-[500px]">
-                                <div id="monthly-payroll-container" class="space-y-4">
+                            <div class="p-5 sm:p-8 flex-1 overflow-y-auto max-h-[500px]">
+                                <div id="monthly-payroll-container" class="space-y-3 sm:space-y-4">
                                     <!-- Rendered via JS -->
                                 </div>
                             </div>
                         </div>
 
                         <!-- Detail Transaksi -->
-                        <div class="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col overflow-hidden reveal-on-scroll">
-                            <div class="p-6 md:p-8 border-b border-slate-100 bg-slate-50/50">
-                                <h2 class="font-black text-xl text-slate-900 tracking-tight flex items-center"><i class="fas fa-receipt text-red-500 mr-3"></i> Log Transaksi</h2>
+                        <div class="bg-white rounded-3xl sm:rounded-[2.5rem] border border-slate-200 shadow-sm flex flex-col overflow-hidden reveal-on-scroll">
+                            <div class="p-5 sm:p-8 border-b border-slate-100 bg-slate-50/50">
+                                <h2 class="font-black text-lg sm:text-xl text-slate-900 tracking-tight flex items-center"><i class="fas fa-receipt text-red-500 mr-2 sm:mr-3"></i> Log Transaksi</h2>
                             </div>
-                            <div class="p-0 flex-1 overflow-y-auto max-h-[500px]">
-                                <table class="w-full text-left border-collapse">
+                            <div class="p-0 flex-1 overflow-x-auto overflow-y-auto max-h-[500px]">
+                                <table class="w-full text-left border-collapse min-w-[320px]">
                                     <thead class="sticky top-0 bg-white/95 backdrop-blur-sm z-10">
-                                        <tr class="text-slate-400 font-black text-[10px] uppercase tracking-widest border-b border-slate-200">
-                                            <th class="p-5">Waktu</th>
-                                            <th class="p-5">Detail</th>
-                                            <th class="p-5 text-right">Nominal</th>
+                                        <tr class="text-slate-400 font-black text-[9px] sm:text-[10px] uppercase tracking-widest border-b border-slate-200">
+                                            <th class="p-4 sm:p-5">Waktu</th>
+                                            <th class="p-4 sm:p-5">Detail</th>
+                                            <th class="p-4 sm:p-5 text-right">Nominal</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="transaction-table-body" class="text-sm font-semibold text-slate-700 divide-y divide-slate-100">
+                                    <tbody id="transaction-table-body" class="text-xs sm:text-sm font-semibold text-slate-700 divide-y divide-slate-100">
                                         <!-- Rendered via JS -->
                                     </tbody>
                                 </table>
@@ -717,34 +726,42 @@
     
     <!-- Modal Owner Auth -->
     <div id="modal-owner-auth" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[70] flex items-center justify-center hidden opacity-0 transition-opacity p-4">
-        <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl max-w-sm w-full transform scale-95 transition-transform" id="owner-auth-content">
-            <div class="text-center mb-8">
-                <div class="w-20 h-20 bg-slate-50 border border-slate-200 text-slate-900 rounded-3xl flex items-center justify-center mx-auto mb-5 text-3xl shadow-sm">
+        <div class="bg-white p-6 sm:p-10 rounded-3xl sm:rounded-[2.5rem] shadow-2xl max-w-sm w-full transform scale-95 transition-transform" id="owner-auth-content">
+            <div class="text-center mb-6 sm:mb-8">
+                <div class="w-16 h-16 sm:w-20 sm:h-20 bg-slate-50 border border-slate-200 text-slate-900 rounded-2xl sm:rounded-3xl flex items-center justify-center mx-auto mb-4 sm:mb-5 text-2xl sm:text-3xl shadow-sm">
                     <i class="fas fa-lock"></i>
                 </div>
-                <h3 class="text-2xl font-black text-slate-900 mb-2 tracking-tight">Otorisasi Owner</h3>
-                <p class="text-slate-500 text-xs font-bold uppercase tracking-widest">Demo PIN: 123456</p>
+                <h3 class="text-xl sm:text-2xl font-black text-slate-900 mb-2 tracking-tight">Otorisasi Owner</h3>
+                <p class="text-slate-500 text-[10px] sm:text-xs font-bold uppercase tracking-widest">Demo PIN: 123456</p>
             </div>
-            <input type="password" id="input-owner-pin" oninput="autoValidatePIN(this)" maxlength="6" class="w-full text-center tracking-[1em] font-black text-2xl py-4 border-2 border-slate-200 rounded-2xl mb-6 focus:border-blue-500 focus:ring-0 outline-none bg-slate-50 transition-colors" placeholder="••••••">
-            <button onclick="closeOwnerAuth()" class="btn-interactive w-full py-4 bg-white border border-slate-200 text-slate-600 font-black rounded-xl hover:bg-slate-50 transition-colors text-sm uppercase tracking-widest shadow-sm">Batal</button>
+            <input type="password" id="input-owner-pin" oninput="autoValidatePIN(this)" maxlength="6" class="w-full text-center tracking-[0.5em] sm:tracking-[1em] font-black text-xl sm:text-2xl py-3.5 sm:py-4 border-2 border-slate-200 rounded-2xl mb-5 sm:mb-6 focus:border-blue-500 focus:ring-0 outline-none bg-slate-50 transition-colors" placeholder="••••••">
+            <button onclick="closeOwnerAuth()" class="btn-interactive w-full py-3.5 sm:py-4 bg-white border border-slate-200 text-slate-600 font-black rounded-xl hover:bg-slate-50 transition-colors text-xs sm:text-sm uppercase tracking-widest shadow-sm">Batal</button>
         </div>
     </div>
 
     <!-- Modal Success -->
     <div id="modal-success" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[70] flex items-center justify-center hidden opacity-0 transition-opacity p-4">
-        <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl max-w-sm w-full text-center transform scale-95 transition-transform border border-slate-200" id="modal-content">
-            <div class="w-24 h-24 bg-green-500 text-white rounded-3xl flex items-center justify-center mx-auto mb-6 text-4xl shadow-xl shadow-green-500/30">
+        <div class="bg-white p-6 sm:p-10 rounded-3xl sm:rounded-[2.5rem] shadow-2xl max-w-sm w-full text-center transform scale-95 transition-transform border border-slate-200" id="modal-content">
+            <div class="w-20 h-20 sm:w-24 sm:h-24 bg-green-500 text-white rounded-2xl sm:rounded-3xl flex items-center justify-center mx-auto mb-5 sm:mb-6 text-3xl sm:text-4xl shadow-xl shadow-green-500/30">
                 <i class="fas fa-check"></i>
             </div>
-            <h3 class="text-2xl font-black text-slate-900 mb-3 tracking-tight">Berhasil!</h3>
-            <p class="text-slate-500 mb-8 text-sm font-medium leading-relaxed">Transaksi tersimpan dan telah masuk ke dalam laporan bulanan Owner.</p>
-            <button onclick="closeModal()" class="btn-interactive w-full py-4 bg-slate-900 hover:bg-blue-600 text-white font-black rounded-xl text-sm uppercase tracking-widest shadow-lg shadow-slate-900/20 transition-colors">Tutup & Order Baru</button>
+            <h3 class="text-xl sm:text-2xl font-black text-slate-900 mb-2 sm:mb-3 tracking-tight">Berhasil!</h3>
+            <p class="text-slate-500 mb-6 sm:mb-8 text-xs sm:text-sm font-medium leading-relaxed">Transaksi tersimpan dan telah masuk ke dalam laporan bulanan Owner.</p>
+            <button onclick="closeModal()" class="btn-interactive w-full py-3.5 sm:py-4 bg-slate-900 hover:bg-blue-600 text-white font-black rounded-xl text-xs sm:text-sm uppercase tracking-widest shadow-lg shadow-slate-900/20 transition-colors">Tutup & Order Baru</button>
         </div>
     </div>
 
     <!-- Modal Alert -->
     <div id="modal-alert" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[80] flex items-center justify-center hidden opacity-0 transition-opacity p-4">
-        <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl max-w-sm w-full text-center transform scale-95 transition-transform" id="modal-alert-content">
+        <div class="bg-white p-6 sm:p-10 rounded-3xl sm:rounded-[2.5rem] shadow-2xl max-w-sm w-full text-center transform scale-95 transition-transform" id="modal-alert-content">
+            <div class="w-20 h-20 sm:w-24 sm:h-24 bg-red-50 border border-red-100 text-red-500 rounded-2xl sm:rounded-3xl flex items-center justify-center mx-auto mb-5 sm:mb-6 text-3xl sm:text-4xl shadow-sm">
+                <i id="alert-icon" class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 id="alert-title" class="text-xl sm:text-2xl font-black text-slate-900 mb-2 sm:mb-3 tracking-tight">Peringatan</h3>
+            <p class="text-slate-500 mb-6 sm:mb-8 text-xs sm:text-sm font-medium leading-relaxed" id="alert-message">Pesan error disini.</p>
+            <button onclick="closeAlert()" class="btn-interactive w-full py-3.5 sm:py-4 bg-slate-900 text-white font-black rounded-xl text-xs sm:text-sm uppercase tracking-widest shadow-lg shadow-slate-900/20">Mengerti</button>
+        </div>
+    </div>
             <div class="w-24 h-24 bg-red-50 border border-red-100 text-red-500 rounded-3xl flex items-center justify-center mx-auto mb-6 text-4xl shadow-sm">
                 <i id="alert-icon" class="fas fa-exclamation-triangle"></i>
             </div>
@@ -1181,11 +1198,11 @@
                 const isSelected = state.selectedKapster === k.id;
                 container.innerHTML += `
                     <div onclick="selectKapster('${k.id}', '${k.name}')" id="sel-kapster-${k.id}" 
-                         class="btn-interactive interactive-element cursor-pointer bg-white border-2 ${isSelected ? 'border-blue-600 bg-blue-50/50' : 'border-slate-200'} rounded-3xl p-4 flex flex-col items-center hover:border-blue-500 transition-all select-none group shadow-sm">
-                        <div id="avatar-${k.id}" class="w-14 h-14 rounded-2xl ${isSelected ? 'border-blue-200 bg-blue-100 text-blue-600' : 'bg-slate-50 border-slate-200 text-slate-400'} border flex items-center justify-center font-black text-2xl mb-3 transition-colors shadow-sm group-hover:text-blue-600 group-hover:border-blue-200 group-hover:bg-blue-50">
+                         class="btn-interactive interactive-element cursor-pointer bg-white border-2 ${isSelected ? 'border-blue-600 bg-blue-50/50' : 'border-slate-200'} rounded-2xl sm:rounded-3xl p-3 sm:p-4 flex flex-col items-center hover:border-blue-500 transition-all select-none group shadow-sm">
+                        <div id="avatar-${k.id}" class="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl ${isSelected ? 'border-blue-200 bg-blue-100 text-blue-600' : 'bg-slate-50 border-slate-200 text-slate-400'} border flex items-center justify-center font-black text-lg sm:text-2xl mb-2 sm:mb-3 transition-colors shadow-sm group-hover:text-blue-600 group-hover:border-blue-200 group-hover:bg-blue-50">
                             ${k.avatar}
                         </div>
-                        <span class="font-black ${isSelected ? 'text-blue-700' : 'text-slate-700'} text-xs uppercase tracking-widest group-hover:text-blue-700 transition-colors">${k.name}</span>
+                        <span class="font-black ${isSelected ? 'text-blue-700' : 'text-slate-700'} text-[11px] sm:text-xs uppercase tracking-widest group-hover:text-blue-700 transition-colors text-center truncate max-w-full">${k.name}</span>
                     </div>
                 `;
             });
